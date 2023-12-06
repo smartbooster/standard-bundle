@@ -8,6 +8,7 @@
           "Smart\\StandardBundle\\SmartStandardBundle": ["dev", "test"]
         },
         "copy-from-package": {
+          "make/": "make/",
           "phpcs.xml": "phpcs.xml",
           "phpstan.neon": "phpstan.neon"
         }
