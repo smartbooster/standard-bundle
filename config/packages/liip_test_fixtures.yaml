@@ -1,0 +1,3 @@
+liip_test_fixtures:
+  # https://github.com/liip/LiipTestFixturesBundle/blob/master/doc/caveats.md#damadoctrinetestbundle
+  keep_database_and_schema: true
