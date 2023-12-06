@@ -3,12 +3,11 @@
     "smartbooster/standard-bundle": {
       "manifest": {
         "bundles": {
-          "Smart\\StandardBundle\\SmartStandardBundle": [
-            "dev",
-            "test"
-          ]
+          "DAMA\\DoctrineTestBundle\\DAMADoctrineTestBundle": ["test"],
+          "Liip\\TestFixturesBundle\\LiipTestFixturesBundle": ["test"],
+          "Smart\\StandardBundle\\SmartStandardBundle": ["dev", "test"]
         },
-        "copy-from-recipe": {
+        "copy-from-package": {
           "phpcs.xml": "phpcs.xml",
           "phpstan.neon": "phpstan.neon"
         }

@@ -4,6 +4,23 @@ Bundle grouping all dev vendor that we use for testing and coding with the SMART
 
 ## Installation
 
+Add the following to your project's composer.json file:
+
+```json
+{
+    "extra": {
+        "symfony": {
+            "endpoint": [
+                "https://api.github.com/repos/smartbooster/standard-bundle/contents/recipes.json", 
+                "flex://defaults"
+            ]
+        }
+    }
+}
+```
+
+Then require the bundle into your dev requirements:
+
 ```bash
 composer require --dev smartbooster/standard-bundle
 ```
