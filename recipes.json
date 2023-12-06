@@ -2,13 +2,14 @@
   "recipes": {
     "smartbooster/standard-bundle": [
       "0.1",
-      "0.2"
+      "0.2",
+      "0.3"
     ]
   },
   "branch": "main",
   "_links": {
     "repository": "github.com/smartbooster/standard-bundle",
-    "origin_template": "{package}:{version}@github.com/smartbooster/standard-bundle:main",
-    "recipe_template": "https://api.github.com/repos/smartbooster/standard-bundle/contents/{package_dotted}.{version}.json"
+    "origin_template": "{package}:{version}@github.com/smartbooster/standard-bundle:{version}",
+    "recipe_template": "https://api.github.com/repos/smartbooster/standard-bundle/contents/manifest.json"
   }
 }
