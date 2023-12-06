@@ -9,9 +9,6 @@
     <arg name="extensions" value="php"/>
 
     <rule ref="PSR12">
-        <properties>
-            <property name="lineLimit" value="150"/> <!-- maximum line length -->
-        </properties>
     </rule>
 
     <file>bin/</file>
