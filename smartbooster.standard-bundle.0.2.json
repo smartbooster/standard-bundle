@@ -8,8 +8,8 @@
           "Smart\\StandardBundle\\SmartStandardBundle": ["dev", "test"]
         },
         "copy-from-package": {
-          "config/packages/test/dama_doctrine_test_bundle.yaml": "config/packages/dama_doctrine_test_bundle.yaml",
-          "config/packages/test/liip_test_fixtures.yaml": "config/packages/liip_test_fixtures.yaml",
+          "config/packages/dama_doctrine_test_bundle.yaml": "%CONFIG_DIR%/packages/test/dama_doctrine_test_bundle.yaml",
+          "config/packages/liip_test_fixtures.yaml": "%CONFIG_DIR%/packages/test/liip_test_fixtures.yaml",
           "make/qualimetry.mk": "make/qualimetry.mk",
           "make/test.mk": "make/test.mk",
           "phpcs.xml": "phpcs.xml",
