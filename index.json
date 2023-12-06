@@ -1,0 +1,13 @@
+{
+  "recipes": {
+    "smartbooster/standard-bundle": [
+      "0.1"
+    ]
+  },
+  "branch": "main",
+  "_links": {
+    "repository": "github.com/smartbooster/standard-bundle",
+    "origin_template": "{package}:{version}@github.com/smartbooster/standard-bundle:main",
+    "recipe_template": "https://api.github.com/repos/smartbooster/standard-bundle/contents/{package_dotted}.{version}.json"
+  }
+}

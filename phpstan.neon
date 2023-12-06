@@ -1,0 +1,17 @@
+includes:
+    - vendor/phpstan/phpstan-doctrine/extension.neon
+    - vendor/phpstan/phpstan-doctrine/rules.neon
+    - vendor/phpstan/phpstan-symfony/extension.neon
+    - vendor/phpstan/phpstan-symfony/rules.neon
+
+parameters:
+    checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false
+    symfony:
+        container_xml_path: var/cache/dev/App_KernelDevDebugContainer.xml
+    ignoreErrors:
+        # https://accesto.com/blog/how-to-ensure-php-code-quality-static-analysis-using-phpstan-with-symfony/
+        # - '#Call to an undefined method Doctrine\\ORM\\EntityRepository<.+>::.+#'
+    # https://github.com/symfony/symfony/issues/36202#issuecomment-769226149
+    bootstrapFiles:
+        - vendor/bin/.phpunit/phpunit/vendor/autoload.php
