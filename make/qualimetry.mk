@@ -33,7 +33,7 @@ metrics: ## Build static analysis from the php in src. Repports available in ./b
 
 .PHONY: phpstan
 phpstan: ## Launch PHP Static Analysis
-	vendor/bin/phpstan analyse src tests --level=7 --xdebug -c phpstan.neon
+	vendor/bin/phpstan analyse src tests --level=7 -c phpstan.neon
 
 .PHONY: qualimetry qa
 qualimetry: phpstan checkstyle lint-php lint-twig lint-yaml lint-container composer-validate ## Launch all qualimetry rules. Shortcut "make qa"
