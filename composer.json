@@ -2,7 +2,7 @@
   "name": "smartbooster/standard-bundle",
   "type": "symfony-bundle",
   "description": "Bundle grouping all dev vendor that we use for testing and coding with the SMART BOOSTER standards",
-  "keywords": ["symfony", "bundle", "standard", "code-standards", "quality"],
+  "keywords": ["dev", "testing", "static analysis", "symfony", "bundle", "standard", "code-standards", "quality"],
   "license": "MIT",
   "authors": [
     {
