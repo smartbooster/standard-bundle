@@ -14,10 +14,11 @@
           "make/test.mk": "make/test.mk",
           "phpcs.xml": "phpcs.xml",
           "phpstan.neon": "phpstan.neon",
-          "phpunit.xml.dist": "phpunit.xml.dist"
+          "phpunit.xml.dist": "phpunit.xml.dist",
+          "test.txt": "test.txt"
         }
       },
-      "ref": "c46f62860256cef1b390dec6ceec400728fdc275"
+      "ref": "c58c521dabe730253bc680495c313f1dde5f799b"
     }
   }
 }
