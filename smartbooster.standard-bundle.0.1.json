@@ -8,17 +8,12 @@
           "Smart\\StandardBundle\\SmartStandardBundle": ["dev", "test"]
         },
         "copy-from-package": {
-          "config/packages/dama_doctrine_test_bundle.yaml": "%CONFIG_DIR%/packages/test/dama_doctrine_test_bundle.yaml",
-          "config/packages/liip_test_fixtures.yaml": "%CONFIG_DIR%/packages/test/liip_test_fixtures.yaml",
           "make/qualimetry.mk": "make/qualimetry.mk",
-          "make/test.mk": "make/test.mk",
           "phpcs.xml": "phpcs.xml",
-          "phpstan.neon": "phpstan.neon",
-          "phpunit.xml.dist": "phpunit.xml.dist",
-          "test.txt": "test.txt"
+          "phpstan.neon": "phpstan.neon"
         }
       },
-      "ref": "c58c521dabe730253bc680495c313f1dde5f799b"
+      "ref": "bc5e2992adbaf6ff0100cdca1ca19fc8960b17cd"
     }
   }
 }
