@@ -1,0 +1,26 @@
+{
+  "manifests": {
+    "smartbooster/standard-bundle": {
+      "manifest": {
+        "bundles": {
+          "DAMA\\DoctrineTestBundle\\DAMADoctrineTestBundle": ["test"],
+          "Liip\\TestFixturesBundle\\LiipTestFixturesBundle": ["test"],
+          "Smart\\StandardBundle\\SmartStandardBundle": ["dev", "test"]
+        },
+        "copy-from-package": {
+          "config/packages/dama_doctrine_test_bundle.yaml": "%CONFIG_DIR%/packages/test/dama_doctrine_test_bundle.yaml",
+          "config/packages/liip_test_fixtures.yaml": "%CONFIG_DIR%/packages/test/liip_test_fixtures.yaml",
+          "make/qualimetry.mk": "make/qualimetry.mk",
+          "make/test.mk": "make/test.mk",
+          "phpcs.xml": "phpcs.xml",
+          "phpstan.neon": "phpstan.neon",
+          "phpunit.xml.dist": "phpunit.xml.dist"
+        },
+        "gitignore": [
+          "/.phpcs-cache"
+        ]
+      },
+      "ref": "cf266721b0b4c0e484d1a10512081e3d142f9071"
+    }
+  }
+}
