@@ -17,7 +17,9 @@ composer require --dev smartbooster/standard-bundle
 ```
 
 When being prompted "Do you want to execute this recipe?" from the other bundle (Phpstan, Codesnif, Dama, ...) answer No and press enter.  
-The standard-bundle has its own onboarded recipe which will copy the missing files from the repository (check the dotted manifest to see which files).
+The standard-bundle has its own recipe which will cover the bundles mentioned above (check the dotted manifest to see which files).
+
+> Don't forget to do a recipe reset to have the latest changes from the recipe copied files (see next section).
 
 ## Reinstall the recipe to the latest changes
 
