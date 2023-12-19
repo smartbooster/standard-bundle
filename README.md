@@ -9,26 +9,10 @@ Bundle grouping all dev vendor that we use for testing and coding with the SMART
 
 ## Installation
 
-> As this bundle is still in development and not added to the symfony/recipes-contrib repo, you need to manually add the recipe endpoint on your composer.json
-
-To do so, add the following to your project's composer.json file:
-
-```json
-{
-    "extra": {
-        "symfony": {
-            "endpoint": [
-                "https://api.github.com/repos/smartbooster/standard-bundle/contents/recipes.json", 
-                "flex://defaults"
-            ]
-        }
-    }
-}
-```
-
-Then require the bundle into your dev requirements:
-
 ```bash
+# As this bundle is still in development and not added to the symfony/recipes-contrib repo, you need to manually add the recipe endpoint on your composer.json
+composer config --json extra.symfony.endpoint '["https://api.github.com/repos/smartbooster/standard-bundle/contents/recipes.json", "flex://defaults"]'
+# Then require the bundle into your dev requirements:
 composer require --dev smartbooster/standard-bundle
 ```
 
@@ -40,7 +24,7 @@ The standard-bundle has its own onboarded recipe which will copy the missing fil
 If you require an upper version or update the bundle version on your project, run the following command to execute the recipe with the latest changes
 
 ```bash
-composer recipes:install smartbooster/standard-bundle --force
+composer recipes:install smartbooster/standard-bundle --reset --force
 ```
 
 ## Working on the bundle
@@ -61,7 +45,7 @@ Then add it to the recipes.json list.
 
 Pull requests are welcome.
 
-Thanks to [everyone who has contributed](https://github.com/smartbooster/symfony-docker/contributors) already.
+Thanks to [everyone who has contributed](https://github.com/smartbooster/standard-bundle/contributors) already.
 
 ---
 
