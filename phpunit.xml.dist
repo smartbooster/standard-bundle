@@ -18,6 +18,7 @@
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak"/>
         <env name="KERNEL_CLASS" value="App\Kernel"/>
         <env name="APP_SECRET" value="$ecretf0rt3st"/>
+        <env name="MAILER_DSN" value="null://null"/>
 
         <!-- ###+ sentry/sentry-symfony ### -->
         <env name="SENTRY_DSN" value=""/>
