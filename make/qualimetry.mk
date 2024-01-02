@@ -16,7 +16,7 @@ cbf: code-beautifier
 lint-php: ## Linter PHP
 	find config src tests -type f -name "*.php" -exec php -l {} \;
 lint-twig: ## Linter Twig
-	find templates -type f -name "*.twig" | xargs $(CONSOLE) lint:twig
+	$(CONSOLE) lint:twig templates
 lint-yaml: ## Linter Yaml
 	$(CONSOLE) lint:yaml config translations
 lint-container: ## Linter Container service definitions
