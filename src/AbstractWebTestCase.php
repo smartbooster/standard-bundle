@@ -88,4 +88,16 @@ abstract class AbstractWebTestCase extends WebTestCase
 
         return $method;
     }
+
+    /**
+     * Test if $array contains exactly all values of $values no matter there order
+     */
+    public function assertArrayContainsValues(array $values, array $array): void
+    {
+        $this->assertCount(count($values), $array);
+
+        foreach ($values as $value) {
+            $this->assertContains($value, $array);
+        }
+    }
 }
