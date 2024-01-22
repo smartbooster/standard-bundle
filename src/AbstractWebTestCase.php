@@ -100,4 +100,9 @@ abstract class AbstractWebTestCase extends WebTestCase
             $this->assertContains($value, $array);
         }
     }
+
+    protected function loadFixtureFiles(array $files): void
+    {
+        $this->databaseTool->loadAliceFixture($files);
+    }
 }
