@@ -1,5 +1,11 @@
 CHANGELOG for 1.x
 ===================
+## v1.0.4 - (2024-01-22)
+
+### Added
+
+- `composer.json` : Allow using dama/doctrine-test-bundle version ^6.7 to reduce the need of updating doctrine/dbal
+
 ## v1.0.3 - (2024-01-22)
 
 ### Added
