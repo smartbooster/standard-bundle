@@ -1,5 +1,11 @@
 CHANGELOG for 1.x
 ===================
+## v1.0.5 - (2025-07-28)
+### Added
+- `phpcs.xml` rule to ignore line limit on comments
+### Changed
+- `test.mk` remove --colors options to control them from the phpunit.xml
+
 ## v1.0.4 - (2024-01-22)
 
 ### Added
