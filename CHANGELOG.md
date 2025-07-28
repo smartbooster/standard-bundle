@@ -1,5 +1,10 @@
 CHANGELOG for 1.x
 ===================
+## v1.1.0 - (2025-07-28)
+### Added
+- `composer.json` add liip/test-fixtures-bundle:^3.0 for PHP 8.4 support
+- `composer.json` add phpstan/phpstan-doctrine & symfony :2.0 for PHP 8.4 support
+
 ## v1.0.5 - (2025-07-28)
 ### Added
 - `phpcs.xml` rule to ignore line limit on comments
