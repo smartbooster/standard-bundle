@@ -1,5 +1,9 @@
 CHANGELOG for 1.x
 ===================
+## v1.1.1 - (2025-07-29)
+### Added
+- `composer.json` add dama/doctrine-test-bundle:^8.0 to fix deprecations on PHP 8.4 support
+
 ## v1.1.0 - (2025-07-28)
 ### Added
 - `composer.json` add liip/test-fixtures-bundle:^3.0 for PHP 8.4 support
