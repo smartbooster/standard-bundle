@@ -16,7 +16,7 @@
     "dama/doctrine-test-bundle": "^6.7|^7.1|^8.0",
     "dealerdirect/phpcodesniffer-composer-installer": "^1.2",
     "doctrine/orm": "^2.13",
-    "friendsofphp/php-cs-fixer": "^3.92",
+    "friendsofphp/php-cs-fixer": "^3.86",
     "liip/test-fixtures-bundle": "^2.4|^3.0",
     "pheromone/phpcs-security-audit": "^2.0",
     "phpmetrics/phpmetrics": "^2.8",
