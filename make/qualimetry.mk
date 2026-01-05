@@ -37,7 +37,7 @@ lint-container: ## Linter Container service definitions
 .PHONY: composer-validate
 composer-validate: ## Validate composer.json and composer.lock
 	composer validate composer.json
-	composer audit
+	composer audit --abandoned=report
 
 .PHONY: metrics
 metrics: ## Build static analysis from the php in src. Repports available in ./build/index.html

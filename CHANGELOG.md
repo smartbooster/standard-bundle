@@ -1,5 +1,9 @@
 CHANGELOG for 1.x
 ===================
+## v1.2.2 - (2026-01-05)
+### Changed
+- `qualimetry.mk` : composer audit --abandoned flag set to report instead of fail (the fail behavior must be handled by the scheduled audit job)
+
 ## v1.2.1 - (2026-01-05)
 ### Fixed
 - Fix recipes .php-cs-fixer.dist.php missing .php extension
