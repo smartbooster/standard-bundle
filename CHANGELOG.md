@@ -1,5 +1,9 @@
 CHANGELOG for 1.x
 ===================
+## v1.2.1 - (2026-01-05)
+### Fixed
+- Fix recipes .php-cs-fixer.dist.php missing .php extension
+
 ## v1.2.0 - (2026-01-05)
 ### Added
 - `composer.json` add more qualimetry requirements :
