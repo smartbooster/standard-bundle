@@ -5,7 +5,7 @@ Bundle grouping all dev vendor that we use for testing and coding with the SMART
 ## What's inside !
 
 - All the development vendors that we used daily to check our code quality. 
-- Makefiles with QA and testing commands to easily run them.
+- Makefiles with [QA](docs/qa.md) and testing commands to easily run them.
 
 ## Installation
 

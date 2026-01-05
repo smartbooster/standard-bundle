@@ -8,6 +8,14 @@
     <arg name="cache" value=".phpcs-cache"/>
     <arg name="colors"/>
     <arg name="extensions" value="php"/>
+    <arg name="report" value="full,summary,source"/>
+    <config name="installed_paths" value="vendor/pheromone/phpcs-security-audit"/>
+
+    <!-- Security rule de phpcs-security-audit -->
+    <rule ref="Security">
+        <exclude name="Security.BadFunctions.CallbackFunctions"/>
+        <exclude name="Security.BadFunctions.FilesystemFunctions"/>
+    </rule>
 
     <rule ref="PSR12">
     </rule>

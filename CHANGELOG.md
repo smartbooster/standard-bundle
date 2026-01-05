@@ -1,5 +1,19 @@
 CHANGELOG for 1.x
 ===================
+## v1.2.0 - (2026-01-05)
+### Added
+- `composer.json` add more qualimetry requirements :
+  - pheromone/phpcs-security-audit and dealerdirect/phpcodesniffer-composer-installer for security sniff
+  - friendsofphp/php-cs-fixer to enhance complience with the symfony coding standards
+  - yamadashy/phpstan-friendly-formatter and spaze/phpstan-disallowed-calls to improve phpstan output and disallowed-calls 
+- `qualimetry.mk` add symfony-checkstyle command based on php-cs-fixer + [qa.md](docs/qa.md) docs
+- `.php-cs-fixer.dist` default PHPCSFixer config
+- `phpcs.xml` add Security sniff from pheromone/phpcs-security-audit
+- `phpstan.neon` add disallowed-calls rule + friendly-formatter and cache config
+
+## Removed
+- `sebastian/phpcpd` requirement as it is flag has abandoned and no longer maintained.
+
 ## v1.1.2 - (2025-07-30)
 ### Changed
 - `phpunit.xml` update config on SYMFONY_PHPUNIT_VERSION 12.2 for PHP 8.4 support (@mathieu-ducrot)
