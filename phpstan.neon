@@ -3,8 +3,33 @@ includes:
     - vendor/phpstan/phpstan-doctrine/rules.neon
     - vendor/phpstan/phpstan-symfony/extension.neon
     - vendor/phpstan/phpstan-symfony/rules.neon
+    - ./vendor/yamadashy/phpstan-friendly-formatter/extension.neon
+    - vendor/spaze/phpstan-disallowed-calls/extension.neon
 
 parameters:
+    disallowedFunctionCalls:
+        -
+            function: 'exec()'
+            message: 'for security reasons. Use Symfony Process component instead.'
+        -
+            function: 'eval()'
+            message: 'for security reasons.'
+        -
+            function: 'system()'
+            message: 'for security reasons.'
+        -
+            function: 'passthru()'
+            message: 'for security reasons.'
+        -
+            function: 'shell_exec()'
+            message: 'for security reasons.'
+        -
+            function: 'popen()'
+            message: 'is risky. Ensure you are handling the process handle correctly.'
+    friendly:
+        lineBefore: 0  # Number of lines to display before error line (default: 2)
+        lineAfter: 0   # Number of lines to display after error line (default: 2)
+    errorFormat: friendly
     symfony:
         containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
     ignoreErrors:
@@ -16,3 +41,6 @@ parameters:
     # https://github.com/symfony/symfony/issues/36202#issuecomment-769226149
     bootstrapFiles:
         - vendor/bin/.phpunit/phpunit/vendor/autoload.php
+
+    # Temporary directory where PHPStan stores its cache and working files during analysis.
+    tmpDir: var/cache/phpstan
