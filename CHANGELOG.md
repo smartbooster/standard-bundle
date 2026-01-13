@@ -1,5 +1,10 @@
 CHANGELOG for 1.x
 ===================
+## v1.2.3 - (2026-01-13)
+### Added
+- recipe `smartbooster.standard-bundle.1.2.json` : add tests/bootstrap.php
+- `.php-cs-fixer.dist.php` add class_definition and concat_space rule config
+
 ## v1.2.2 - (2026-01-05)
 ### Changed
 - `qualimetry.mk` : composer audit --abandoned flag set to report instead of fail (the fail behavior must be handled by the scheduled audit job)

@@ -13,6 +13,7 @@
           "make/dev.mk": "make/dev.mk",
           "make/qualimetry.mk": "make/qualimetry.mk",
           "make/test.mk": "make/test.mk",
+          "tests/bootstrap.php": "tests/bootstrap.php",
           "phpcs.xml": "phpcs.xml",
           "phpstan.neon": "phpstan.neon",
           "phpunit.xml.dist": "phpunit.xml.dist",
