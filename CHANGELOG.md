@@ -1,5 +1,9 @@
 CHANGELOG for 1.x
 ===================
+## v1.2.4 - (2026-01-15)
+### Fixed
+- `tests/bootstrap.php` : fix phpstan false positive detection on CI
+
 ## v1.2.3 - (2026-01-13)
 ### Added
 - recipe `smartbooster.standard-bundle.1.2.json` : add tests/bootstrap.php
