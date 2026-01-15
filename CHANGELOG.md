@@ -1,5 +1,15 @@
 CHANGELOG for 1.x
 ===================
+## v1.3.1 - (2026-01-15)
+### Added
+- `qualimetry.mk` symfony-checkstyle-fix qa command, alias sfcs-fix
+
+### Fixed
+- `qualimetry.mk` fix the code-beautifier to return 0 on success even it's fixing some files
+
+## Removed
+- `.php-cs-fixer.dist.php` config moved in the platform-core-bundle stubs install
+
 ## v1.3.0 - (2026-01-15)
 ### Fixed
 - Forced minor version to generate a new recipe to ensure proper copy for the files `tests/bootstrap.php`, `phpstan.neon` and `.php-cs-fixer.dist.php`

@@ -14,6 +14,9 @@ sfcs: symfony-checkstyle
 symfony-checkstyle-diff: ## Symfony Coding Standards Checkstyle with diff
 	vendor/bin/php-cs-fixer check -v --diff
 sfcs-diff: symfony-checkstyle-diff
+symfony-checkstyle-fix: ## Symfony Coding Standards Checkstyle fix
+	vendor/bin/php-cs-fixer fix -v --diff
+sfcs-fix: symfony-checkstyle-fix
 symfony-checkstyle-report: ## Symfony Coding Standards Checkstyle command that generate a json report and follow up command to get the number of occurence
 	vendor/bin/php-cs-fixer check --format=json -v > php_cs_fixer_report.json
 	# Then run the following outside of docker : cat php_cs_fixer_report.json | jq -r '.files[] | select(.appliedFixers != null) | .appliedFixers[]' | sort | uniq -c | sort -nr
@@ -21,7 +24,7 @@ sfcs-report: symfony-checkstyle-report
 
 .PHONY: code-beautifier cbf
 code-beautifier: ## Code beautifier (Checkstyle fixer)
-	vendor/bin/phpcbf
+	vendor/bin/phpcbf || true
 cbf: code-beautifier
 
 .PHONY: lint-php lint-twig lint-yaml lint-container
