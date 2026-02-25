@@ -1,5 +1,9 @@
 CHANGELOG for 1.x
 ===================
+## v1.4.0 - (2026-02-25)
+### Added
+- Allow Symfony 7.4
+
 ## v1.3.1 - (2026-01-15)
 ### Added
 - `qualimetry.mk` symfony-checkstyle-fix qa command, alias sfcs-fix
