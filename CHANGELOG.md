@@ -1,6 +1,9 @@
 CHANGELOG for 1.x
 ===================
 ## v1.4.2 - (2025-04-16)
+### Added
+- recipe 1.4.2
+
 ### Fixed
 - recipe 1.4 & 1.4.1 : remove copy `.php-cs-fixer.dist.php`
 
