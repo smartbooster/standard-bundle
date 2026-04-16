@@ -1,5 +1,13 @@
 CHANGELOG for 1.x
 ===================
+## v1.4.1 - (2025-04-15)
+### Added
+- Allow `doctrine/orm` ^v3.0
+
+### Changed
+- Moved `phpmetrics/phpmetrics` as suggested vendor package becasue it's not on the qualimetry calls command and also because it requires use to do a
+  downgrade of `nikic/php-parser` from 5.0 to 4.18 on default symfony-docker install which is needed by the `symfony/maker-bundle`
+
 ## v1.4.0 - (2026-02-25)
 ### Added
 - Allow Symfony 7.4
