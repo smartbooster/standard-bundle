@@ -16,8 +16,7 @@
           "tests/bootstrap.php": "tests/bootstrap.php",
           "phpcs.xml": "phpcs.xml",
           "phpstan.neon": "phpstan.neon",
-          "phpunit.xml.dist": "phpunit.xml.dist",
-          ".php-cs-fixer.dist.php": ".php-cs-fixer.dist.php"
+          "phpunit.xml.dist": "phpunit.xml.dist"
         },
         "gitignore": [
           "/.phpcs-cache"
