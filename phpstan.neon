@@ -30,6 +30,21 @@ parameters:
         -
             function: 'popen()'
             message: 'is risky. Ensure you are handling the process handle correctly.'
+        -
+            function: 'md5()'
+            message: 'md5 is cryptographically broken. Use hash() with a strong algorithm, or password_hash() for passwords.'
+        -
+            function: 'sha1()'
+            message: 'sha1 is cryptographically broken. Use hash() with a strong algorithm, or password_hash() for passwords.'
+        -
+            function: 'assert()'
+            message: 'assert() can evaluate a string as PHP code. Avoid it for security reasons.'
+        -
+            function: 'error_reporting()'
+            message: 'configure error reporting through the environment, not at runtime.'
+        -
+            function: 'ini_set()'
+            message: 'configure PHP through php.ini / the environment, not at runtime.'
     doctrine:
         allowNullablePropertyForRequiredField: true
     friendly:

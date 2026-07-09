@@ -1,5 +1,27 @@
 CHANGELOG for 1.x
 ===================
+## v1.5.0 - (2026-07-09)
+### Added
+- Psalm taint analysis to detect security vulnerabilities (SQL injection, XSS, command/LDAP/header/SSRF/file injection...), replacing the abandoned `pheromone/phpcs-security-audit`:
+  - `composer.json` : add `vimeo/psalm` and `psalm/plugin-symfony` requirements
+  - `psalm.xml` taint-only config, `psalm-taint-stubs.php` custom stub for Doctrine ORM/DBAL SQL sinks, `psalm-taint-baseline.xml` baseline
+  - `qualimetry.mk` : add `psalm`/`pst`, `psalm-generate-baseline`/`psgb` and `psalm-ci` commands, `psalm-ci` is now part of `make qualimetry`/`qa`
+  - `docs/psalm.md` documentation
+  - `adr/20260709-php-security-audit-migration.md` : ADR detailing the sniff-by-sniff coverage analysis behind the migration
+  - recipe `smartbooster.standard-bundle.1.5.json` : ship `psalm.xml`, `psalm-taint-stubs.php` and `psalm-taint-baseline.xml`
+- `phpstan.neon` : ban `md5`, `sha1`, `assert`, `error_reporting` and `ini_set` via `disallowedFunctionCalls` (weak crypto / eval-like / runtime config changes)
+- `docs/phpstan.md` dedicated documentation (extracted and expanded from `docs/qa.md`)
+
+### Changed
+- `qualimetry.mk` : `checkstyle`/`cs` now runs `php-cs-fixer` (previously ran `phpcs`); the former `symfony-checkstyle*`/`sfcs*` targets are renamed `checkstyle*`/`cs*` since php-cs-fixer is now the only checkstyle tool
+- `docs/qa.md` reworked : security section now points to Psalm taint analysis, PHPStan/Psalm details extracted to their own doc pages
+- `README.md` : "Reinstall the recipe" section renamed "Updating the standard-bundle", now mentions running `composer update` first and to check the CHANGELOG for vendor files removed by the recipe (recipe reset --force doesn't remove past copied files)
+- `recipes.json` : register version `1.5`
+
+### Removed
+- `composer.json` : `pheromone/phpcs-security-audit` and `squizlabs/php_codesniffer` requirements (abandoned, replaced by Psalm taint analysis + PHPStan disallowed calls ; see `adr/20260709-php-codesniffer-removal.md` for the `php_codesniffer`/PHP-CS-Fixer duplication rationale)
+- `phpcs.xml` config, and the `code-beautifier`/`cbf` (`phpcbf`) make target ; no longer copied by the recipe
+
 ## v1.4.2 - (2025-04-16)
 ### Added
 - recipe 1.4.2
