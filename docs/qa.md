@@ -34,7 +34,7 @@ with the official standard put forward by the framework.
 
 **Ease migration to full checkstyle compliance**
 
-Just like PHPStan, we advice running the command `make symfony-checkstyle` and report each unhandled rule as `false` in `.php-cs-fixer.dist` as the following :
+Just like PHPStan, we advice running the command `make checkstyle` and report each unhandled rule as `false` in `.php-cs-fixer.dist` as the following :
 
 ```php
 // ...

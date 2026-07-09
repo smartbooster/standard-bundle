@@ -5,7 +5,7 @@ We use [Psalm](https://psalm.dev/) **only for its [taint analysis](https://psalm
 Taint analysis tracks untrusted data from a *source* (HTTP input) to a *sink* (SQL query, HTML output, shell command…) and reports the flow. 
 
 > It replaces the abandoned `pheromone/phpcs-security-audit` for injection/XSS detection, with **real data-flow analysis** instead of pattern matching 
-> (far fewer false positives) (see [/adr/20260709-php-security-audit-migration](20260709-php-security-audit-migration) for more info).
+> (far fewer false positives) (see the [migration ADR](../adr/20260709-php-security-audit-migration.md) for more info).
 
 ## Process
 
@@ -32,7 +32,7 @@ Configuration lives in `psalm.xml`, tuned to run **taint only**:
 ### Setup
 
 `vimeo/psalm` and `psalm/plugin-symfony` are part of the bundle `require`, and the recipe (manifest `1.5+`) ships `psalm.xml` + `psalm-taint-stubs.php` via `copy-from-package`.
-Projects pick them up with `composer recipes:install smartbooster/standard-bundle --reset --force`, then generate their baseline with `make pstgb`.
+Projects pick them up with `composer recipes:install smartbooster/standard-bundle --reset --force`, then generate their baseline with `make psgb`.
 
 ### Baseline 
 

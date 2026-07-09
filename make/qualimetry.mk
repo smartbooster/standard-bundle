@@ -18,12 +18,20 @@ cs-report: checkstyle-report
 
 .PHONY: lint-php lint-twig lint-yaml lint-container
 lint-php: ## Linter PHP
-	@find src tests config -type f -name '*.php' | \
-	while IFS= read -r file; do \
+	@files=$$(find src tests config -type f -name '*.php'); \
+	total=$$(printf "%s\n" "$$files" | wc -l); \
+	current=0; \
+	for file in $$files; do \
+		current=$$((current + 1)); \
+		printf "\rLint PHP [%d/%d]" $$current $$total; \
 		output=$$(php -l "$$file"); \
 		status=$$?; \
-		[ $$status -eq 0 ] || { echo "$$output"; exit $$status; }; \
-	done
+		if [ $$status -ne 0 ]; then \
+			printf "\n%s\n" "$$output"; \
+			exit $$status; \
+		fi; \
+	done; \
+	printf "\rLint PHP [%d/%d] OK\n" $$total $$total
 lint-twig: ## Linter Twig
 	$(CONSOLE) lint:twig templates
 lint-yaml: ## Linter Yaml

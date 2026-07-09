@@ -15,15 +15,12 @@
           "make/test.mk": "make/test.mk",
           "tests/bootstrap.php": "tests/bootstrap.php",
           "phpstan.neon": "phpstan.neon",
-          "phpstan-baseline": "phpstan-baseline",
+          "phpstan-baseline.neon": "phpstan-baseline.neon",
           "psalm.xml": "psalm.xml",
           "psalm-taint-stubs.php": "psalm-taint-stubs.php",
           "psalm-taint-baseline.xml": "psalm-taint-baseline.xml",
           "phpunit.xml.dist": "phpunit.xml.dist"
-        },
-        "gitignore": [
-          "/.phpcs-cache"
-        ]
+        }
       },
       "ref": "0e954d249dbb15c9d641f358169172a8e150cd04"
     }
