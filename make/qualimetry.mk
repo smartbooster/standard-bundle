@@ -72,5 +72,5 @@ psalm-ci: ## Psalm taint analysis applying the baseline (only reports new taint 
 	vendor/bin/psalm --use-baseline=psalm-taint-baseline.xml
 
 .PHONY: qualimetry qa
-qualimetry: phpstan psalm-ci checkstyle lint-php lint-twig lint-yaml lint-container composer-validate ## Launch all qualimetry rules. Shortcut "make qa"
+qualimetry: phpstan checkstyle psalm-ci lint-php lint-twig lint-yaml lint-container composer-validate ## Launch all qualimetry rules. Shortcut "make qa"
 qa: qualimetry
