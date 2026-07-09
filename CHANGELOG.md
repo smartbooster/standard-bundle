@@ -3,6 +3,7 @@ CHANGELOG for 1.x
 ## v1.5.0 - (2026-07-09)
 ### TODO When updating
 Manual cleanup steps `composer recipes:install --reset --force` cannot handle by itself when a project upgrades to `1.5` :
+- Check the project's existing `.php-cs-fixer.dist.php` before resetting the recipe : it is now copied by `standard-bundle` again (previously scaffolded once by `platform-core-bundle`'s stubs install, untracked by any recipe) ; `--reset --force` will overwrite it with the bundle's example, so merge in any project-specific rules first
 - Delete the project's own `phpcs.xml` (no longer part of the recipe, not removed automatically)
 - Run `composer update` so `pheromone/phpcs-security-audit`, `squizlabs/php_codesniffer` and `dealerdirect/phpcodesniffer-composer-installer` are actually dropped from `composer.lock`/`vendor/`, and remove the now-unused `dealerdirect/phpcodesniffer-composer-installer` entry from the project's own `composer.json` `config.allow-plugins` if it was added there
 - Update any hardcoded CI/pipeline scripts referencing the renamed make targets (`symfony-checkstyle*`/`sfcs*` → `checkstyle*`/`cs*`) or the removed `code-beautifier`/`cbf` target
@@ -10,6 +11,7 @@ Manual cleanup steps `composer recipes:install --reset --force` cannot handle by
 - Remove the now-stale `/.phpcs-cache` line from the project's `.gitignore` (the recipe reset won't remove it, it only adds new entries)
 
 ### Added
+- `.php-cs-fixer.dist.php` example config re-added and shipped again via the recipe (`smartbooster.standard-bundle.1.5.json`) ; it had been removed in v1.3.1 in favor of the `platform-core-bundle` stubs install
 - Psalm taint analysis to detect security vulnerabilities (SQL injection, XSS, command/LDAP/header/SSRF/file injection...), replacing the abandoned `pheromone/phpcs-security-audit`:
   - `composer.json` : add `vimeo/psalm` and `psalm/plugin-symfony` requirements
   - `psalm.xml` taint-only config, `psalm-taint-stubs.php` custom stub for Doctrine ORM/DBAL SQL sinks, `psalm-taint-baseline.xml` baseline
