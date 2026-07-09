@@ -12,12 +12,16 @@ on:
 jobs:
   qualimetry:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.4', '8.5']
     steps:
       - uses: actions/checkout@v4
 
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '${{ matrix.php-version }}'
           coverage: none
 
       - name: Composer install
@@ -38,17 +42,20 @@ jobs:
           <container xmlns="http://symfony.com/schema/dic/services"><services></services></container>
           EOF
 
-      - name: Composer validate + audit
-        run: make -f make/qualimetry.mk composer-validate
-
-      - name: Lint PHP
-        run: make -f make/qualimetry.mk lint-php
-
-      - name: Checkstyle (PHP-CS-Fixer)
-        run: make -f make/qualimetry.mk checkstyle
+      # We run each qualemtry checks one by one (instead of the global `make qualimetry`) to have a cleaner feedback for each configuration
+      # Also other SF lint (twig, yaml, container) doesn't need to be tested here as they are don't have any specifique configuration
 
       - name: PHPStan
-        run: make -f make/qualimetry.mk phpstan
+        run: make phpstan
+
+      - name: Checkstyle (PHP-CS-Fixer)
+        run: make checkstyle
 
       - name: Psalm taint analysis (baseline-aware)
-        run: make -f make/qualimetry.mk psalm-ci
+        run: make psalm-ci
+
+      - name: Lint PHP
+        run: make lint-php
+
+      - name: Composer validate + audit
+        run: make composer-validate

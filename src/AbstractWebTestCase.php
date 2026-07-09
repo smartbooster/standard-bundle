@@ -19,6 +19,7 @@ abstract class AbstractWebTestCase extends WebTestCase
         parent::setUp();
 
         $this->client = self::createClient();
+        // qa: False positive - EntityManagerInterface is registered by DoctrineBundle in a real consuming app; this repo's CI stubs an empty container (see CLAUDE.md) @phpstan-ignore assign.propertyType, symfonyContainer.serviceNotFound
         $this->entityManager = static::getContainer()->get(EntityManagerInterface::class);
         // https://github.com/liip/LiipTestFixturesBundle/blob/2.x/UPGRADE-2.0.md
         // @phpstan-ignore-next-line
@@ -29,10 +30,11 @@ abstract class AbstractWebTestCase extends WebTestCase
     {
         parent::tearDown();
         // https://github.com/liip/LiipTestFixturesBundle/pull/196/files
+        // qa: False positive - unsetting releases the DB tool service between tests, no property hooks are defined @phpstan-ignore unset.possiblyHookedProperty
         unset($this->databaseTool);
 
         // avoid memory leaks
-        if ($this->entityManager != null) {
+        if (null != $this->entityManager) {
             $this->entityManager->close();
             $this->entityManager = null;
         }
@@ -45,7 +47,10 @@ abstract class AbstractWebTestCase extends WebTestCase
 
     protected function getProjectTestDir(): string
     {
-        return $this->getParameter('kernel.project_dir') . '/tests';
+        /** @var string $projectDir */
+        $projectDir = $this->getParameter('kernel.project_dir');
+
+        return $projectDir . '/tests';
     }
 
     protected function getFixturesDir(): string
@@ -65,7 +70,7 @@ abstract class AbstractWebTestCase extends WebTestCase
 
     /**
      * Return object property who can be private
-     * https://www.yellowduck.be/posts/test-private-and-protected-properties-using-phpunit
+     * https://www.yellowduck.be/posts/test-private-and-protected-properties-using-phpunit.
      */
     public static function getProperty(object $object, string $property): mixed
     {
@@ -78,7 +83,8 @@ abstract class AbstractWebTestCase extends WebTestCase
 
     /**
      * Return object method who can be private
-     * https://stackoverflow.com/questions/249664/best-practices-to-test-protected-methods-with-phpunit
+     * https://stackoverflow.com/questions/249664/best-practices-to-test-protected-methods-with-phpunit.
+     *
      * @param class-string $class
      */
     protected static function getMethod(string $name, string $class): \ReflectionMethod
@@ -90,7 +96,10 @@ abstract class AbstractWebTestCase extends WebTestCase
     }
 
     /**
-     * Test if $array contains exactly all values of $values no matter there order
+     * Test if $array contains exactly all values of $values no matter there order.
+     *
+     * @param array<mixed> $values
+     * @param array<mixed> $array
      */
     public function assertArrayContainsValues(array $values, array $array): void
     {
@@ -101,6 +110,9 @@ abstract class AbstractWebTestCase extends WebTestCase
         }
     }
 
+    /**
+     * @param list<string> $files
+     */
     protected function loadFixtureFiles(array $files): void
     {
         $this->databaseTool->loadAliceFixture($files);
