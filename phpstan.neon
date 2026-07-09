@@ -25,6 +25,9 @@ parameters:
             function: 'shell_exec()'
             message: 'for security reasons.'
         -
+            function: 'phpinfo()'
+            message: 'for security reasons.'
+        -
             function: 'popen()'
             message: 'is risky. Ensure you are handling the process handle correctly.'
     doctrine:
