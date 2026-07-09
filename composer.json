@@ -26,6 +26,9 @@
     "vimeo/psalm": "^6.0",
     "yamadashy/phpstan-friendly-formatter": "^1.3"
   },
+  "require-dev": {
+    "symfony/phpunit-bridge": "^7.4"
+  },
   "suggest": {
     "phpmetrics/phpmetrics": "Build static analysis from the php in src with make metrics command. Require to have nikic/php-parser ^4.18 to run."
   },

@@ -1,0 +1,54 @@
+name: Qualimetry
+
+# Runs the qualimetry.mk targets that are self-contained (no consumer Symfony app needed).
+# lint-twig / lint-yaml / lint-container are intentionally NOT run here: they call $(CONSOLE),
+# which only exists in a real consuming project (this repo ships the config/Makefile, not an app).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  qualimetry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Composer install
+        run: composer install --no-progress --prefer-dist
+
+      # PHPStan's bootstrapFiles + src/AbstractWebTestCase.php & AbstractValidatorTest.php (which extend PHPUnit classes)
+      # need PHPUnit resolvable; simple-phpunit downloads it on first run.
+      - name: Bootstrap PHPUnit
+        run: vendor/bin/simple-phpunit --version
+
+      # This repo ships phpstan.neon/psalm.xml as templates for a real Symfony app (containerXmlPath points at a
+      # booted kernel's container dump). There is no app here, so stub an empty one instead of booting a kernel.
+      - name: Stub Symfony container dump
+        run: |
+          mkdir -p var/cache/dev
+          cat > var/cache/dev/App_KernelDevDebugContainer.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <container xmlns="http://symfony.com/schema/dic/services"><services></services></container>
+          EOF
+
+      - name: Composer validate + audit
+        run: make -f make/qualimetry.mk composer-validate
+
+      - name: Lint PHP
+        run: make -f make/qualimetry.mk lint-php
+
+      - name: Checkstyle (PHP-CS-Fixer)
+        run: make -f make/qualimetry.mk checkstyle
+
+      - name: PHPStan
+        run: make -f make/qualimetry.mk phpstan
+
+      - name: Psalm taint analysis (baseline-aware)
+        run: make -f make/qualimetry.mk psalm-ci

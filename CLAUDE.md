@@ -12,11 +12,22 @@ template distributed by the recipe, or documentation.
 ## Commands
 
 `make/*.mk` (`qualimetry.mk`, `test.mk`, `dev.mk`) are themselves the recipe deliverable: they use `$(CONSOLE)`/`$(ENV)` variables that are only
-defined by a consuming project's root Makefile. Don't invoke them with `make` in this repo — run the underlying vendor binaries directly instead:
+defined by a consuming project's root Makefile. Don't invoke them with `make` in this repo — run the underlying vendor binaries directly instead.
+
+When this bundle is checked out as a vendored dependency of a consumer project (e.g. under `vendor/smartbooster/standard-bundle/` inside
+`client-project`), PHP only exists inside that project's `php` Docker container — there is no host PHP to rely on. Run every command below
+through it: `docker compose exec php <command>` from the consumer project root (or `docker compose exec --user=dev php bash` for a shell first).
+Do not run `php`/`vendor/bin/*` directly against the host PHP install; it will not match the container's PHP version/extensions and can produce
+misleading results (e.g. missing `var/cache/dev/App_KernelDevDebugContainer.xml` errors from `phpstan-symfony` when there's no app to boot).
 
 - Static analysis (types, level 10 + disallowed calls): `vendor/bin/phpstan analyse src tests --level=10 --memory-limit=1G -v -c phpstan.neon`
   - Regenerate baseline: same command with `--allow-empty-baseline --generate-baseline` (writes `phpstan-baseline.neon`)
-- Security taint analysis (SQLi/XSS/...): `vendor/bin/psalm`
+  - Requires two things this repo doesn't have out of the box (see `.github/workflows/qualimetry.yml` for the exact steps): a stub
+    `var/cache/dev/App_KernelDevDebugContainer.xml` (`phpstan.neon`'s `symfony.containerXmlPath` expects a booted kernel's container dump — an
+    empty `<container xmlns="http://symfony.com/schema/dic/services"><services></services></container>` is enough), and PHPUnit installed
+    (`vendor/bin/simple-phpunit --version` once) since `src/AbstractWebTestCase.php`/`AbstractValidatorTest.php` extend real PHPUnit/Symfony
+    test classes and `phpstan.neon`'s `bootstrapFiles` points at `vendor/bin/.phpunit/phpunit/vendor/autoload.php`
+- Security taint analysis (SQLi/XSS/...): `vendor/bin/psalm` (only needs the container XML stub above, not PHPUnit)
   - CI mode (fail only on new findings): `vendor/bin/psalm --use-baseline=psalm-taint-baseline.xml`
   - Regenerate baseline: `vendor/bin/psalm --set-baseline=psalm-taint-baseline.xml`
 - Coding standard checkstyle: `vendor/bin/php-cs-fixer check -v` (`--diff` to preview, `fix` instead of `check` to auto-fix)
@@ -58,6 +69,11 @@ Every structuring decision on this bundle (adding, replacing or removing a tool/
 sections **Context / Goal / Selected solution / Impact**. Check `adr/` before assuming *why* a tool exists or was dropped — e.g.
 `20260709-php-security-audit-migration.md` (Psalm vs. `pheromone/phpcs-security-audit`) and `20260709-php-codesniffer-removal.md`
 (PHP-CS-Fixer vs. `squizlabs/php_codesniffer`).
+
+### CI (`.github/workflows/qualimetry.yml`)
+Runs `composer-validate`, `lint-php`, `checkstyle`, `phpstan` and `psalm-ci` (via `make -f make/qualimetry.mk <target>`, since this repo has no
+root Makefile of its own) on push to `main` and on pull requests. `lint-twig`/`lint-yaml`/`lint-container` are intentionally excluded — they
+call `$(CONSOLE)`, which only exists in a real consuming app.
 
 ### Release workflow
 Changes are tracked manually in `CHANGELOG.md` (`## vX.Y.Z - (date)` with `### Added/Changed/Removed/Fixed` sections). When a change affects
