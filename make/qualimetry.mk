@@ -48,7 +48,12 @@ metrics: ## Build static analysis from the php in src. Repports available in ./b
 
 .PHONY: phpstan
 phpstan: ## Launch PHP Static Analysis
-	vendor/bin/phpstan analyse src tests --level=10 --memory-limit=1G -c phpstan.neon
+	vendor/bin/phpstan analyse src tests --level=10 --memory-limit=1G -v -c phpstan.neon
+
+.PHONY: phpstan-generate-baseline pgb
+phpstan-generate-baseline: ## Launch PHP Static Analysis to generate the baseline
+	vendor/bin/phpstan analyse src tests --level=10 --memory-limit=1G -vv -c phpstan.neon --allow-empty-baseline --generate-baseline
+pgb: phpstan-generate-baseline
 
 .PHONY: qualimetry qa
 qualimetry: phpstan checkstyle symfony-checkstyle lint-php lint-twig lint-yaml lint-container composer-validate ## Launch all qualimetry rules. Shortcut "make qa"
