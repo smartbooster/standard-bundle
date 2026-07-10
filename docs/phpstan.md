@@ -67,7 +67,16 @@ See the PHPStan docs on [ignoreErrors](https://phpstan.org/user-guide/ignoring-e
 **Security via `disallowedFunctionCalls`.**
 - PHPStan covers the *presence-based* security checks that taint analysis structurally cannot (a function is dangerous regardless of data-flow).
 - We ban, among others: `eval`, `exec`, `system`, `passthru`, `shell_exec`, `popen`, `phpinfo`, `assert`, `md5`, `sha1`, `error_reporting`, `ini_set`.
-- Injection/XSS (data-flow) is handled by [Psalm](psalm.md); dependency CVEs by `composer audit`.
+- Taint analysis such as injection/XSS (data-flow) is handled by [Psalm](psalm.md); 
+- dependency CVEs check by `composer audit`.
+
+**A note on `ekino/phpstan-banned-code`.**
+- Also listed in the [PHPStan extension library](https://phpstan.org/user-guide/extension-library), it can look like an alternative to
+  `phpstan-disallowed-calls` — it isn't: it only bans global functions and a handful of language constructs (`echo`, `print`, `eval`, `exit`,
+  backticks), with no support for banning method calls, static calls, namespaces, constants, superglobals or attributes.
+- It has no per-rule custom `message` and no `allowIn`/`allowExceptIn` exemption mechanism (both used above and in `phpstan.neon`).
+- Its only feature without a `phpstan-disallowed-calls` equivalent is `BannedUseTestRule` (forbids importing test classes from app code) — too
+  narrow on its own to justify switching. Replacing `phpstan-disallowed-calls` with it would be a functional regression.
 
 ## FAQ
 
