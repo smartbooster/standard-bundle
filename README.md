@@ -9,8 +9,8 @@ Bundle grouping all dev vendor that we use for testing and coding with the SMART
   - security taint analysis with [Psalm](docs/psalm.md), 
   - checkstyle and coding standards with [PHP-CS-Fixer](https://github.com/php-cs-fixer/php-cs-fixer) 
   - native linters (php, twig, yaml, sf container)
-  - tests bundle configuration for [PHPUnit](https://phpunit.de/index.html)
-- Makefiles with [QA](docs/qa.md) and testing commands to easily run them.
+  - tests bundle configuration for [PHPUnit](docs/phpunit.md)
+- Makefiles with [QA](docs/qa.md) and [testing](docs/phpunit.md) commands to easily run them.
 
 ## Installation
 
