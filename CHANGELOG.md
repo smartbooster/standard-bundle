@@ -1,5 +1,9 @@
 CHANGELOG for 1.x
 ===================
+## v1.5.1 - (2026-07-10)
+### Added
+- `docs/phpunit.md` dedicated testing documentation
+
 ## v1.5.0 - (2026-07-09)
 ### TODO When updating
 Manual cleanup steps `composer recipes:install --reset --force` cannot handle by itself when a project upgrades to `1.5` :
