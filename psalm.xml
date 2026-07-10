@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<psalm
+    runTaintAnalysis="true"
+    errorLevel="8"
+    cacheDirectory="var/cache/psalm"
+    findUnusedCode="false"
+    findUnusedVariablesAndParams="false"
+    findUnusedPsalmSuppress="false"
+    findUnusedBaselineEntry="false"
+    findUnusedIssueHandlerSuppression="false"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+>
+    <projectFiles>
+        <directory name="src" />
+        <ignoreFiles>
+            <directory name="vendor" />
+        </ignoreFiles>
+    </projectFiles>
+
+    <stubs>
+        <file name="psalm-taint-stubs.php" />
+    </stubs>
+
+    <plugins>
+        <pluginClass class="Psalm\SymfonyPsalmPlugin\Plugin">
+            <containerXml>var/cache/dev/App_KernelDevDebugContainer.xml</containerXml>
+        </pluginClass>
+    </plugins>
+</psalm>

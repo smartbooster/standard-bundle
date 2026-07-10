@@ -1,10 +1,13 @@
 includes:
     - vendor/phpstan/phpstan-doctrine/extension.neon
     - vendor/phpstan/phpstan-doctrine/rules.neon
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-phpunit/rules.neon
     - vendor/phpstan/phpstan-symfony/extension.neon
     - vendor/phpstan/phpstan-symfony/rules.neon
     - ./vendor/yamadashy/phpstan-friendly-formatter/extension.neon
     - vendor/spaze/phpstan-disallowed-calls/extension.neon
+    - phpstan-baseline.neon
 
 parameters:
     disallowedFunctionCalls:
@@ -24,20 +27,41 @@ parameters:
             function: 'shell_exec()'
             message: 'for security reasons.'
         -
+            function: 'phpinfo()'
+            message: 'for security reasons.'
+        -
             function: 'popen()'
             message: 'is risky. Ensure you are handling the process handle correctly.'
+        -
+            function: 'md5()'
+            message: 'md5 is cryptographically broken. Use hash() with a strong algorithm, or password_hash() for passwords.'
+        -
+            function: 'sha1()'
+            message: 'sha1 is cryptographically broken. Use hash() with a strong algorithm, or password_hash() for passwords.'
+        -
+            function: 'assert()'
+            message: 'assert() can evaluate a string as PHP code. Avoid it for security reasons.'
+        -
+            function: 'error_reporting()'
+            message: 'configure error reporting through the environment, not at runtime.'
+        -
+            function: 'ini_set()'
+            message: 'configure PHP through php.ini / the environment, not at runtime.'
+    doctrine:
+        allowNullablePropertyForRequiredField: true
     friendly:
         lineBefore: 0  # Number of lines to display before error line (default: 2)
         lineAfter: 0   # Number of lines to display after error line (default: 2)
     errorFormat: friendly
+    reportUnmatchedIgnoredErrors: true
     symfony:
         containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
     ignoreErrors:
-        # Ignore error by identifier
-        - identifier: doctrine.columnType
-        # - identifier: doctrine.associationType
-        # - identifier: missingType.generics
-        # - identifier: missingType.iterableValue
+        # method.nonObject ignoré dans tests/ : les fixtures initialisent des objets partiels
+        # dont certaines methodes peuvent retourner null avant d'etre completement renseignes.
+        -
+            identifier: method.nonObject
+            path: tests/
     # https://github.com/symfony/symfony/issues/36202#issuecomment-769226149
     bootstrapFiles:
         - vendor/bin/.phpunit/phpunit/vendor/autoload.php

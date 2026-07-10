@@ -1,0 +1,61 @@
+name: Qualimetry
+
+# Runs the qualimetry.mk targets that are self-contained (no consumer Symfony app needed).
+# lint-twig / lint-yaml / lint-container are intentionally NOT run here: they call $(CONSOLE),
+# which only exists in a real consuming project (this repo ships the config/Makefile, not an app).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  qualimetry:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.4', '8.5']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '${{ matrix.php-version }}'
+          coverage: none
+
+      - name: Composer install
+        run: composer install --no-progress --prefer-dist
+
+      # PHPStan's bootstrapFiles + src/AbstractWebTestCase.php & AbstractValidatorTest.php (which extend PHPUnit classes)
+      # need PHPUnit resolvable; simple-phpunit downloads it on first run.
+      - name: Bootstrap PHPUnit
+        run: vendor/bin/simple-phpunit --version
+
+      # This repo ships phpstan.neon/psalm.xml as templates for a real Symfony app (containerXmlPath points at a
+      # booted kernel's container dump). There is no app here, so stub an empty one instead of booting a kernel.
+      - name: Stub Symfony container dump
+        run: |
+          mkdir -p var/cache/dev
+          cat > var/cache/dev/App_KernelDevDebugContainer.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <container xmlns="http://symfony.com/schema/dic/services"><services></services></container>
+          EOF
+
+      # We run each qualemtry checks one by one (instead of the global `make qualimetry`) to have a cleaner feedback for each configuration
+      # Also other SF lint (twig, yaml, container) doesn't need to be tested here as they are don't have any specifique configuration
+
+      - name: PHPStan
+        run: make phpstan
+
+      - name: Checkstyle (PHP-CS-Fixer)
+        run: make checkstyle
+
+      - name: Psalm taint analysis (baseline-aware)
+        run: make psalm-ci
+
+      - name: Lint PHP
+        run: make lint-php
+
+      - name: Composer validate + audit
+        run: make composer-validate
