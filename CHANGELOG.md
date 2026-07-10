@@ -21,6 +21,7 @@ Manual cleanup steps `composer recipes:install --reset --force` cannot handle by
   - `docs/psalm.md` documentation
   - `adr/20260709-php-security-audit-migration.md` : ADR detailing the sniff-by-sniff coverage analysis behind the migration
   - recipe `smartbooster.standard-bundle.1.5.json` : ship `psalm.xml`, `psalm-taint-stubs.php` and `psalm-taint-baseline.xml`
+- `composer.json` : add `phpstan/phpstan-phpunit` requirement ; adds PHPUnit-specific PHPStan rules (typed assertion methods, better mock intersection types) and reduces false positives in `tests/`, documented in `docs/phpstan.md`
 - `phpstan.neon` : ban `phpinfo`, `md5`, `sha1`, `assert`, `error_reporting` and `ini_set` via `disallowedFunctionCalls` (info disclosure / weak crypto / eval-like / runtime config changes)
 - `phpstan.neon` : include a new `phpstan-baseline.neon` (empty by default) + `qualimetry.mk` : add `phpstan-generate-baseline`/`pgb` command to generate/update it ; shipped by the recipe (`smartbooster.standard-bundle.1.5.json`)
 - `phpstan.neon` : add `doctrine.allowNullablePropertyForRequiredField: true` and `reportUnmatchedIgnoredErrors: true`
