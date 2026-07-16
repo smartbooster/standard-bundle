@@ -1,5 +1,12 @@
 CHANGELOG for 1.x
 ===================
+## v1.5.2 - (2026-07-16)
+### Changed
+- `docs/phpunit.md` : add "Test Class management" section documenting the 1:1 mapping convention between production and test classes; rename fixture examples from `.yml` to `.yaml` and use a more meaningful fixture filename (`create_simulation.yaml` instead of `test_check_entity.yml`)
+- `docs/phpstan.md` : translate `ignoreErrors` comment from French to English; clarify the `ekino/phpstan-banned-code` section title and add an explicit note that only `phpstan-disallowed-calls` is used
+- `docs/psalm.md` : name `psalm-taint-stubs.php` explicitly in the custom-stub explanation
+- `adr/20260709-php-security-audit-migration.md` : remove Drupal 7 rows from Table 1 (Drupal API absent in a Symfony stack); drop the "Provided by" column from Table 2 and remove rows already covered by the Symfony plugin description
+
 ## v1.5.1 - (2026-07-10)
 ### Added
 - `docs/phpunit.md` dedicated testing documentation

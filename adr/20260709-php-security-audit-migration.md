@@ -38,18 +38,6 @@ Status legend: ✅ covered · 🟡 covered by PHPStan · 🔵 covered by compose
 | BadFunctions/PregReplace               | `preg_replace` `/e` modifier + input             | —                             | `/e` modifier removed since PHP 7                                                           | ⏳      |
 | CVE/20132110                           | CVE-2013-2110 (PHP < 5.3.26)                     | **composer audit**            | dependency version scan                                                                     | 🔵     |
 | CVE/20134113                           | CVE-2013-4113 (PHP < 5.3.27)                     | **composer audit**            | dependency version scan                                                                     | 🔵     |
-| Drupal7/SQLi                           | `db_query()` SQLi (Drupal)                       | **Psalm** (by intent)         | `sql` taint via Doctrine stub (`db_query` API absent)                                       | ✅⚪     |
-| Drupal7/DynQueries                     | dynamic queries (where/having…)                  | **Psalm** (by intent)         | `sql` taint via Doctrine stub — replaces the intended usage                                 | ✅      |
-| Drupal7/DbQueryAC                      | access control on queries (Drupal)               | ⚪                             | Drupal-specific access logic                                                                | ⚪      |
-| Drupal7/AESModule                      | `db_query()` AES module (Drupal)                 | ⚪                             | Drupal API absent                                                                           | ⚪      |
-| Drupal7/HttpRequest                    | SSRF via `drupal_http_request`                   | **Psalm** (by intent)         | `ssrf` taint (curl) for the Symfony equivalent                                              | ✅⚪     |
-| Drupal7/XSSHTMLConstruct               | HTML built with input                            | **Psalm**                     | `html` taint + Twig (Symfony plugin)                                                        | ✅      |
-| Drupal7/XSSFormValue                   | XSS via `#value` (Drupal Form API)               | ⚪                             | Drupal API absent                                                                           | ⚪      |
-| Drupal7/XSSPTheme                      | XSS via `#theme`/html_tag (Drupal)               | ⚪                             | Drupal API absent                                                                           | ⚪      |
-| Drupal7/Cachei                         | cache injection (Drupal)                         | ⚪                             | Drupal cache API absent                                                                     | ⚪      |
-| Drupal7/UserInputWatch                 | input detection (Drupal)                         | ⚪                             | Drupal-specific heuristic                                                                   | ⚪      |
-| Drupal7/AdvisoriesContrib              | vulnerable Drupal contrib modules                | **composer audit**            | dependency advisories (no Drupal here)                                                      | 🔵⚪    |
-| Drupal7/AdvisoriesCore                 | outdated Drupal core                             | **composer audit**            | dependency advisories (no Drupal here)                                                      | 🔵⚪    |
 | Misc/BadCorsHeader                     | `Access-Control-Allow-Origin: *`                 | **nelmio_security** (project) | CORS config handled by nelmio/security-bundle at project level, outside the standard-bundle | ✅⚪    |
 | Misc/IncludeMismatch                   | meta: extensions not scanned by PHPCS            | —                             | PHPCS meta-rule, moot outside PHPCS                                                         | ❌      |
 
@@ -64,21 +52,18 @@ Status legend: ✅ covered · 🟡 covered by PHPStan · 🔵 covered by compose
 
 ### Table 2 — What Psalm taint analysis adds ON TOP (things we didn't have)
 
-| Addition                                   | Detail                                                                                                                                                    | Provided by                    |
-|--------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------|
-| **Real data-flow analysis**                | Source → sink tracking across calls (controller input → sink in a service several calls away). phpcs was single-file / token-based.                       | Psalm (engine)                 |
-| **Near-zero false positives**              | Only flags a proven flow, instead of alerting on every variable near a query (no more mass `phpcs:ignore`).                                               | Psalm (engine)                 |
-| **SQLi on Doctrine ORM/DQL**               | `createQuery`, `QueryBuilder::where/andWhere/having/groupBy` marked as SQL sinks — phpcs only did pattern matching.                                       | `psalm-taint-stubs.php` stub   |
-| **XSS in Twig templates**                  | Taint analysis of Twig templates (unescaped variables). **No** equivalent in phpcs-security-audit.                                                        | Symfony plugin                 |
-| **XSS via Symfony Response**               | `Response`/HTML content marked as `html` sink.                                                                                                            | Symfony plugin                 |
-| **Symfony HTTP sources modeled**           | `Request`, `InputBag`, `ParameterBag`, `HeaderBag` (query/request/attributes/headers) as sources, versioned per Symfony release.                          | Symfony plugin                 |
-| **LDAP injection**                         | `ldap_search` as `ldap` sink.                                                                                                                             | Psalm native                   |
-| **Header injection**                       | `header()` as `header` sink.                                                                                                                              | Psalm native                   |
-| **Object injection / unserialize**         | `unserialize` as `unserialize` sink.                                                                                                                      | Psalm native                   |
-| **SSRF**                                   | `curl_init/curl_setopt/getimagesize` as `ssrf` sink.                                                                                                      | Psalm native                   |
-| **Path/file injection**                    | `file` family (fopen, file_get_contents, include…).                                                                                                       | Psalm native                   |
-| **Cookie injection**                       | `setcookie` as `cookie` sink.                                                                                                                             | Psalm native                   |
-| **Tooled false-positive handling**         | Dedicated taint baseline (`--set-baseline`/`--use-baseline`) + inline suppression via `@psalm-taint-escape sql` (not `@psalm-suppress`).                  | Psalm                          |
+| Addition                                   | Detail                                                                                                                                                    |
+|--------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Real data-flow analysis**                | Source → sink tracking across calls (controller input → sink in a service several calls away). phpcs was single-file / token-based.                       |
+| **Near-zero false positives**              | Only flags a proven flow, instead of alerting on every variable near a query (no more mass `phpcs:ignore`).                                               |
+| **SQLi on Doctrine ORM/DQL**               | `createQuery`, `QueryBuilder::where/andWhere/having/groupBy` marked as SQL sinks — phpcs only did pattern matching.                                       |
+| **LDAP injection**                         | `ldap_search` as `ldap` sink.                                                                                                                             |
+| **Header injection**                       | `header()` as `header` sink.                                                                                                                              |
+| **Object injection / unserialize**         | `unserialize` as `unserialize` sink.                                                                                                                      |
+| **SSRF**                                   | `curl_init/curl_setopt/getimagesize` as `ssrf` sink.                                                                                                      |
+| **Path/file injection**                    | `file` family (fopen, file_get_contents, include…).                                                                                                       |
+| **Cookie injection**                       | `setcookie` as `cookie` sink.                                                                                                                             |
+| **Tooled false-positive handling**         | Dedicated taint baseline (`--set-baseline`/`--use-baseline`) + inline suppression via `@psalm-taint-escape sql` (not `@psalm-suppress`).                  |
 
 ---
 
