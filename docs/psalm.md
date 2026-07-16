@@ -18,7 +18,7 @@ Three pieces make taint analysis understand our Symfony/Doctrine stack:
 | [`psalm/plugin-symfony`](https://github.com/psalm/psalm-plugin-symfony) | **sources**: Symfony HTTP input (`Request`, `InputBag`, `ParameterBag`, `HeaderBag`) + XSS **sinks** (Twig, `Response`)              |
 | `psalm-taint-stubs.php` (custom)                                        | **sinks**: Doctrine ORM/DBAL SQL methods (`createQuery`, `QueryBuilder::where/andWhere/having/groupBy`, `Connection::executeQuery`…) |
 
-The custom stub is required and cannot be replaced by a plugin: no Psalm plugin marks the Doctrine **ORM** query path as an SQL sink 
+The custom stub `psalm-taint-stubs.php` is required and cannot be replaced by a plugin: no Psalm plugin marks the Doctrine **ORM** query path as an SQL sink 
 (`weirdan/doctrine-psalm-plugin` only covers low-level DBAL, and its type stubs even collide with ours). 
 
 Native Psalm already ships SQL sinks for raw `mysqli`/`PDO`, but our code goes through Doctrine.
