@@ -53,8 +53,8 @@ Otherwise, use the config format to specify a path, for example
 
 ```yaml
 ignoreErrors:
-    # method.nonObject ignoré dans tests/ : les fixtures initialisent des objets partiels
-    # dont certaines methodes peuvent retourner null avant d'etre completement renseignes.
+    # method.nonObject ignored in tests/: fixtures initialize partial objects,
+    # so some methods might return null before being fully defined.
     -
         identifier: method.nonObject
         path: tests/
@@ -70,7 +70,8 @@ See the PHPStan docs on [ignoreErrors](https://phpstan.org/user-guide/ignoring-e
 - Taint analysis such as injection/XSS (data-flow) is handled by [Psalm](psalm.md); 
 - dependency CVEs check by `composer audit`.
 
-**A note on `ekino/phpstan-banned-code`.**
+**Why we do not use `ekino/phpstan-banned-code`.**
+Note: This PHPStan extension is not used in this project. We rely exclusively on `phpstan-disallowed-calls`.
 - Also listed in the [PHPStan extension library](https://phpstan.org/user-guide/extension-library), it can look like an alternative to
   `phpstan-disallowed-calls` — it isn't: it only bans global functions and a handful of language constructs (`echo`, `print`, `eval`, `exit`,
   backticks), with no support for banning method calls, static calls, namespaces, constants, superglobals or attributes.

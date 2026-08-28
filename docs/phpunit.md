@@ -33,8 +33,8 @@ Each project has a `tests/Admin/AdminAvailabilityTest.php` extending `AbstractWe
 public function testPageIsOk(): void
 {
     $this->logIn([
-        $this->getMinimalFixturesDir() . '/vendor.yml',
-        $this->getFixturesDir() . '/common/smart_parameter.yml',
+        $this->getMinimalFixturesDir() . '/vendor.yaml',
+        $this->getFixturesDir() . '/common/smart_parameter.yaml',
     ]);
 
     $urls = [
@@ -74,8 +74,8 @@ For dynamic URLs (show/edit pages needing an entity id), load a dedicated fixtur
 public function testDynamicOrganizationPageIsOk(): void
 {
     $this->logIn([
-        $this->getMinimalFixturesDir() . '/vendor.yml',
-        $this->getFixturesDir() . '/Admin/AdminAvailabilityTest/organization.yml',
+        $this->getMinimalFixturesDir() . '/vendor.yaml',
+        $this->getFixturesDir() . '/Admin/AdminAvailabilityTest/organization.yaml',
     ]);
 
     $urls = [
@@ -95,6 +95,23 @@ public function testDynamicOrganizationPageIsOk(): void
 ```
 
 **Rule : Every new page added to the project must be added to this test.**
+
+### Test Class management
+
+When [organizing your test suite in PHPUnit](https://docs.phpunit.de/en/12.5/writing-tests-for-phpunit.html), the industry standard relies on a clean **1:1 mapping** between your production classes and your test classes. Rather than creating isolated test classes for each individual method (like `MethodATest`), you should write a single test class matching your target service (e.g., `ServiceATest` for `ServiceA`).
+
+Inside this class, the best practice is to split your assertions so that **each test method targets exactly one specific scenario** rather than wrapping all validation logic into a single, giant method. This guarantees that if one assertion fails, PHPUnit doesn't halt early and obscure other potential bugs.
+
+```text
+project/
+├── src/                                 
+│   └── Manager/
+│       └── CloudSimulationManager.php   # Contains create() and rollback() methods
+│
+└── tests/                               
+    ├── Manager/
+    │   └── CloudSimulationManagerTest.php   # Tests both create() and rollback()
+```
 
 ### Test fixtures management
 
@@ -117,10 +134,10 @@ tests/
     │   └── user_administrator.yaml
     ├── Admin/
     │   └── AdminAvailabilityTest/       # data owned by that test class only
-    │       └── organization.yml
+    │       └── organization.yaml
     └── Manager/
         └── CloudSimulationManager/
-            └── test_check_entity.yml
+            └── create_simulation.yaml
 ```
 
 Why this separation: a test must be able to evolve its data without silently breaking other tests. Sharing one big fixture set across the suite
@@ -132,7 +149,7 @@ Load them in tests through the `AbstractWebTestCase` helpers:
 ```php
 $this->loadFixtureFiles([
     $this->getFixturesDir() . '/common/user_administrator.yaml',
-    $this->getFixturesDir() . '/Manager/CloudSimulationManager/test_check_entity.yml',
+    $this->getFixturesDir() . '/Manager/CloudSimulationManager/create_simulation.yaml',
 ]);
 ```
 
