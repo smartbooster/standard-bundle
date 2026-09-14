@@ -2,7 +2,7 @@ CHANGELOG for 1.x
 ===================
 ## v1.6.0 - (2026-09-14)
 ### TODO When updating
-Manual steps `composer recipes:install --reset --force` cannot handle by itself when a project upgrades to `1.6` :
+Manual steps `composer recipes:install smartbooster/standard-bundle --reset --force` cannot handle by itself when a project upgrades to `1.6` :
 - Write the project's own `dast_scan/targets.json` : the recipe deliberately never ships it, since base URLs, subdomains and public routes are project-specific (and a shipped example would overwrite the project's file on every reset). Until it exists, every `dast-*` target stops on `build-plan.sh: targets file not found (dast_scan/targets.json)` ; see [docs/security.md](docs/security.md) for the full schema and a starting example
 - Add `/dast_scan/generated` and `/dast_scan/report` to the project's `.gitignore` (generated plans and ZAP reports, rebuilt on each run)
 - Make sure `docker` and `jq` are available on the host running the make targets (the ZAP image is pulled on the first run)
