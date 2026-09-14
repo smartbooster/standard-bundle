@@ -1,5 +1,20 @@
 CHANGELOG for 1.x
 ===================
+## v1.6.0 - (2026-09-14)
+### TODO When updating
+Manual steps `composer recipes:install --reset --force` cannot handle by itself when a project upgrades to `1.6` :
+- Write the project's own `dast_scan/targets.json` : the recipe deliberately never ships it, since base URLs, subdomains and public routes are project-specific (and a shipped example would overwrite the project's file on every reset). Until it exists, every `dast-*` target stops on `build-plan.sh: targets file not found (dast_scan/targets.json)` ; see [docs/security.md](docs/security.md) for the full schema and a starting example
+- Add `/dast_scan/generated` and `/dast_scan/report` to the project's `.gitignore` (generated plans and ZAP reports, rebuilt on each run)
+- Make sure `docker` and `jq` are available on the host running the make targets (the ZAP image is pulled on the first run)
+
+### Added
+- Blackbox DAST scans with [OWASP ZAP](https://www.zaproxy.org/), complementing the static analysis of PHPStan/Psalm by attacking the running application over HTTP (unauthenticated, public routes only) :
+  - `make/security.mk` : `dast-blackbox-passive`, `dast-blackbox-crawl` and `dast-blackbox-active` targets (three increasing levels of invasiveness, each containing the previous), `dast-blackbox-ci` for the integration environment and `dast-plan` to print the generated plan without scanning ; `DAST_IMAGE`, `DAST_TARGETS`, `DAST_PLAN_DIR`, `DAST_REPORT_DIR` and `DAST_JVM_MEM` variables
+  - `dast_scan/build-plan.sh` : generates the ZAP Automation Framework plan (context, requestor, spider/spiderAjax, activeScan, reports) from `dast_scan/targets.json`, so no URL is ever hardcoded in the Makefile
+  - `dast_scan/scripts/phpinfo.js` : custom passive scan rule detecting a `phpinfo()` output in any response body (the native *Hidden File Finder* rule only probes four known paths), injected inline into every generated plan and enabled in the three modes
+  - `docs/security.md` documentation : setup after a recipe reset, `targets.json` schema, commands, reports and troubleshooting
+  - recipe `smartbooster.standard-bundle.1.6.json` : ship `make/security.mk`, `dast_scan/build-plan.sh` and the `dast_scan/scripts/` directory (copied as a directory so future scan rules ship without a new manifest)
+
 ## v1.5.2 - (2026-07-16)
 ### Changed
 - `docs/phpunit.md` : add "Test Class management" section documenting the 1:1 mapping convention between production and test classes; rename fixture examples from `.yml` to `.yaml` and use a more meaningful fixture filename (`create_simulation.yaml` instead of `test_check_entity.yml`)
