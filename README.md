@@ -12,6 +12,8 @@ Bundle grouping all dev vendor that we use for testing and coding with the SMART
   - native linters (php, twig, yaml, sf container)
   - tests bundle configuration for [PHPUnit](docs/phpunit.md)
 - Makefiles with [QA](docs/qa.md) and [testing](docs/phpunit.md) commands to easily run them.
+- Standards that the bundle doesn't technically ship but that we apply on all our projects:
+  - front code validation with [ESLint & Prettier](docs/front_code_validation.md).
 
 ## Installation
 
