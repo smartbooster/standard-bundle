@@ -45,6 +45,7 @@
 
     <extensions>
         <bootstrap class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension" />
+        <bootstrap class="Smart\StandardBundle\Phpunit\DeprecationLoggerExtension"/>
     </extensions>
 </phpunit>
 
