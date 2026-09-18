@@ -222,16 +222,15 @@ Extra package to add:
 
 `yarn add --dev globals`
 
-The scope of the `lint` and `format` commands must be narrowed to the front directories only, `assets` plus the JS files at the
-root, which gives:
+The scope of the `lint` and `format` commands must be narrowed to the only directory holding front code, `assets`, which gives:
 
 ```json
 "scripts": {
-  "lint": "eslint assets \"*.{js,mjs}\" --fix --cache",
-  "lint:check": "eslint assets \"*.{js,mjs}\"",
-  "lint:baseline": "rm -f eslint-suppressions.json && eslint assets \"*.{js,mjs}\" --suppress-all",
-  "format": "prettier --write assets \"*.{js,mjs}\"",
-  "format:check": "prettier --check assets \"*.{js,mjs}\""
+  "lint": "eslint assets --fix --cache",
+  "lint:check": "eslint assets",
+  "lint:baseline": "rm -f eslint-suppressions.json && eslint assets --suppress-all",
+  "format": "prettier --write assets",
+  "format:check": "prettier --check assets"
 }
 ```
 
@@ -239,8 +238,8 @@ A project never validates `vendor/`: a bundle validates its own front code from 
 
 **Specific use of globals in the context of using FOSJsRoutingBundle**
 
-Impact on the ESLint config: the front code runs in the browser while the config files run under Node, and Twig injects globals
-that must be declared, otherwise `no-undef` reports them.
+Impact on the ESLint config: the front code runs in the browser, and Twig injects globals that must be declared, otherwise
+`no-undef` reports them.
 
 ```mjs
 import globals from "globals"
@@ -255,9 +254,14 @@ import globals from "globals"
       },
     },
   },
+```
 
+The root config files (`vite.config.mjs`, `phpstorm.config.js`) stay out of that scope, so there is nothing to declare for Node.
+Widening the scope to them means adding their globals too, as they don't run in the browser:
+
+```mjs
   {
-    // Config files run under Node: `vite.config.js` reads `__dirname`.
+    // Config files run under Node: `vite.config.mjs` reads `__dirname`.
     name: "app/globals-node",
     files: ["**/*.config.{js,mjs}"],
     languageOptions: { globals: { ...globals.node } },
