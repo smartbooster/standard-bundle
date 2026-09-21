@@ -1,9 +1,13 @@
 ##
 ## Tests
 ## -----
-.PHONY: phpunit coverage-text coverage-html coverage jest
+.PHONY: phpunit phpunit-deprecated coverage-text coverage-html coverage jest
 phpunit: ## Launch all tests
 	vendor/bin/simple-phpunit
+
+phpunit-deprecated:
+	rm -rf var/cache/test # must be done for get all deprecated
+	DEPRECATIONS_LOG_FILE="var/log/deprecations_test.log" vendor/bin/simple-phpunit
 
 coverage-text: ## Launch all tests with code coverage text
 	XDEBUG_MODE=coverage vendor/bin/simple-phpunit --coverage-text

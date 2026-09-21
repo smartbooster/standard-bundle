@@ -1,5 +1,11 @@
 CHANGELOG for 1.x
 ===================
+## v1.7.0 - (2026-09-21)
+### Added
+- PHPUnit extension `DeprecationLoggerExtension` and `DeprecationLoggerSubscriber` to intercept and log unhandled deprecations during test execution
+- `phpunit-deprecated` make target to run the test suite and export formatted deprecation reports to a log file.
+- `docs/front_code_validation.md` standard added and mention on README.md
+
 ## v1.6.0 - (2026-09-14)
 ### TODO When updating
 Manual steps `composer recipes:install smartbooster/standard-bundle --reset --force` cannot handle by itself when a project upgrades to `1.6` :
