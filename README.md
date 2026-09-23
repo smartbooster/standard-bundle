@@ -7,7 +7,6 @@ Bundle grouping all dev vendor that we use for testing and coding with the SMART
 - All the development vendors that we use daily to check our code quality: 
   - static analysis with [PHPStan](docs/phpstan.md), 
   - security taint analysis with [Psalm](docs/psalm.md), 
-  - blackbox DAST scans of the running app with [OWASP ZAP](docs/security.md), 
   - checkstyle and coding standards with [PHP-CS-Fixer](https://github.com/php-cs-fixer/php-cs-fixer) 
   - native linters (php, twig, yaml, sf container)
   - tests bundle configuration for [PHPUnit](docs/phpunit.md)
