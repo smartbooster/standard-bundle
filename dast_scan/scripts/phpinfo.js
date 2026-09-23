@@ -10,7 +10,7 @@ const ScanRuleMetadata = Java.type("org.zaproxy.addon.commonlib.scanrules.ScanRu
 
 function getMetadata() {
     return ScanRuleMetadata.fromYaml(`
-id: 100001
+id: 9000004
 name: Exposed phpinfo() output
 description: >
   The response contains the output of the PHP phpinfo() function. It discloses the PHP

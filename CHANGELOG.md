@@ -1,5 +1,49 @@
 CHANGELOG for 1.x
 ===================
+## v1.7.1 - (2026-09-23)
+### TODO When updating
+- Run `composer recipes:install smartbooster/standard-bundle --reset --force` to pick up the updated `make/security.mk`,
+  `dast_scan/build-plan.sh` and `dast_scan/scripts/` (the set of copied files is unchanged, so there is no new dotted manifest)
+- The DAST scans now **fail the build** as soon as an alert reaches `failOnRisk` (default `Low`), where they used to always exit `0` :
+  before enabling `dast-blackbox-ci` on a project that already ran it, either arbitrate the current alerts in `dast_scan/alert-filters.json`
+  or raise `failOnRisk` in the project's `dast_scan/targets.json` ; see [docs/security.md](docs/security.md)
+- Widen `reportRisks` in `dast_scan/targets.json` to at least the levels covered by `failOnRisk` (`["info", "low", "medium", "high"]` with
+  the default), otherwise the CI fails on alerts absent from the reports
+- The first run of each `dast-*` target now downloads the `ascanrulesBeta` add-on into the container (set `DAST_ADDONS=` to opt out)
+
+### Fixed
+
+All the following is added content but it aim to fix the overall behavior of zap scan tool chain.
+
+- `dast_scan/build-plan.sh` : `exitStatus` job appended to every generated plan, the gate that turns an alert into a red pipeline
+  (ZAP itself always exits `0`). `errorLevel` comes from the new `failOnRisk` key of `targets.json` (default `Low`), `warnLevel` is
+  `Informational`, and `alwaysRun: true` keeps the status set when an earlier job interrupts the plan
+- `dast_scan/build-plan.sh` : optional `dast_scan/alert-filters.json` baseline, rendered as an `alertFilter` job emitted before any
+  traffic-generating job (a filter only applies to the alerts raised after it is registered). An alert requalified as `False Positive`
+  is skipped by `exitStatus` while staying visible in the report ; the non-ZAP `note` key of each filter is rendered as a YAML comment
+  above the filter it documents, so the generated plan carries the arbitration. Like `targets.json`, the file is project-specific and
+  **never shipped by the recipe**
+- Three custom passive scan rules in `dast_scan/scripts/`, covering vulnerabilities Qualys reports and ZAP has no native equivalent for :
+  - `form-autocomplete.js` (id `9000001`, QID 150112) : `type="password"` input with autocompletion disabled neither on the field nor on
+    its form — ZAP retired its own rule `10012` in 2018, Qualys still reports it
+  - `blank-target-links.js` (id `9000002`, QID 150222) : cross-domain `target="_blank"` link without `rel="noopener"` — the native rule
+    `10108` only alerts when `rel` explicitly contains `opener`, so a link with no `rel` at all never triggers it, at any threshold
+  - `client-side-cookies.js` (id `9000003`, QID 150122/150123) : cookie written by the served JavaScript — it never appears in a
+    `Set-Cookie` header, so the native rules `10010`/`10011` are structurally blind to it
+- `make/security.mk` : `DAST_ADDONS` variable (default `ascanrulesBeta`), installing the listed add-ons into the container before the scan.
+  The official image ships the release add-ons only, and the CORS active scan rule (alert `40040`, equivalent of Qualys' QID 150631) lives
+  in beta. The install is a **separate `zap.sh` invocation** in the same container : doing it in the `-autorun` run pulls a newer
+  `commonlib` and breaks the custom scripts (`Could not initialize class ...ScanRuleMetadata`)
+- `make/security.mk` : ZAP's `zap.log` copied out of the container into `dast_scan/report/<target>.log` before `--rm` discards it. In
+  `-cmd` mode the log never reaches stdout, so it is the only way to read the warnings counted by the report's `insight.log.warn` ; the
+  copy is unconditional and the exit code saved beforehand, so a failing scan still yields it
+- `docs/security.md` : "The gate (`failOnRisk`)", "The baseline (`dast_scan/alert-filters.json`)" (schema, the `String.matches()` whole-URL
+  trap, the silence of a filter matching nothing) and "Add-ons (`DAST_ADDONS`)" sections ; the custom rules section now lists the four
+  shipped rules and reserves the `9000001+` id range for home-made ones
+
+### Changed
+- `dast_scan/scripts/phpinfo.js` : id `100001` → `9000004`, to sit in the `9000001+` range now reserved for the bundle's own scan rules
+
 ## v1.7.0 - (2026-09-21)
 ### Added
 - PHPUnit extension `DeprecationLoggerExtension` and `DeprecationLoggerSubscriber` to intercept and log unhandled deprecations during test execution
