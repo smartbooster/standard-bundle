@@ -22,11 +22,29 @@ DAST_REPORT_DIR  ?= dast_scan/report
 # to zap.sh takes precedence over that computation.
 DAST_JVM_MEM     ?= 2g
 
+# The official image ships the release add-ons only: the CORS active scan rule (Zap Alert Id 40040, equivalent of the 150631 from
+# Qualys) lives in ascanrulesBeta, which is downloaded into the container. Add-on ids are case sensitive.
+DAST_ADDONS      ?= ascanrulesBeta
+
+# Installing in the same run as -autorun does not work: resolving ascanrulesBeta pulls a newer
+# commonlib, and swapping it while ZAP is up breaks the scripts that build their metadata from it
+# ("Could not initialize class ...ScanRuleMetadata"). Hence two invocations in the same container:
+# the first one installs, the second one starts with everything already in place.
+ifeq ($(strip $(DAST_ADDONS)),)
+DAST_ADDON_CMD   :=
+else
+DAST_ADDON_CMD   := zap.sh -cmd $(foreach addon,$(DAST_ADDONS),-addoninstall $(addon)) &&
+endif
+
 # Generates the plan, named after the make target, then has ZAP execute it.
 # $(1) = mode, $(2) = environment declared in targets.json.
 # The chmod is there for the CI: ZAP runs under uid 1000 and writes its reports into the
 # mounted volume, which the runner creates as root (AccessDeniedException otherwise). The
 # plans directory stays untouched, it is mounted read-only.
+# zap.log is copied out of the container before it is discarded (--rm): in -cmd mode the log
+# never reaches stdout, so it is the only way to read the warnings counted by the report's
+# "insight.log.warn". The copy runs after a ";" and not a "&&", and the exit code is saved
+# beforehand, so a failing scan - the case where the log matters most - still yields it.
 define dast_run
 	@mkdir -p $(CURDIR)/$(DAST_PLAN_DIR) $(CURDIR)/$(DAST_REPORT_DIR)
 	@chmod 777 $(CURDIR)/$(DAST_REPORT_DIR)
@@ -35,7 +53,7 @@ define dast_run
 	docker run --rm --network host \
 		-v $(CURDIR)/$(DAST_PLAN_DIR):/zap/plans:ro \
 		-v $(CURDIR)/$(DAST_REPORT_DIR):/zap/wrk:rw \
-		$(DAST_IMAGE) zap.sh -Xmx$(DAST_JVM_MEM) -cmd -autorun /zap/plans/$@.yaml
+		$(DAST_IMAGE) sh -c '$(DAST_ADDON_CMD) zap.sh -Xmx$(DAST_JVM_MEM) -cmd -autorun /zap/plans/$@.yaml; RC=$$?; cp -f /home/zap/.ZAP/zap.log /zap/wrk/$@.log 2>/dev/null; exit $$RC'
 endef
 
 .PHONY: dast-blackbox-passive dast-blackbox-crawl dast-blackbox-active dast-blackbox-ci dast-plan

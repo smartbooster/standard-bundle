@@ -20,12 +20,18 @@
 #   excludePaths  : regexes taken out of scope in active mode, for the routes that are
 #                   destructive or that trigger emails.
 #
+# Two more files shape the plan:
+#   dast_scan/alert-filters.json : the baseline, turned into an alertFilter job so that an
+#                   arbitrated alert stops failing the build while staying in the report.
+#   dast_scan/scripts/*.js       : home-made scan rules, inlined below.
+#
 set -eu
 
 mode=${1:?"missing mode (passive|crawl|active)"}
 env_name=${2:?"missing environment (see .environments in targets.json)"}
 targets=${3:-"$(dirname "$0")/targets.json"}
 scripts_dir="$(dirname "$0")/scripts"
+filters_file="$(dirname "$0")/alert-filters.json"
 
 command -v jq >/dev/null 2>&1 || { echo "build-plan.sh: jq is required" >&2; exit 1; }
 [ -f "$targets" ] || { echo "build-plan.sh: targets file not found ($targets)" >&2; exit 1; }
@@ -43,6 +49,7 @@ spider_max_mins=$(jq -r --arg env "$env_name" '.environments[$env].spiderMaxMins
 ajax_max_mins=$(jq -r --arg env "$env_name" '.environments[$env].spiderAjaxMaxMins // 2' "$targets")
 active_max_mins=$(jq -r --arg env "$env_name" '.environments[$env].activeScanMaxMins // 10' "$targets")
 report_risks=$(jq -r --arg env "$env_name" '.environments[$env].reportRisks // [] | join(", ")' "$targets")
+fail_on_risk=$(jq -r --arg env "$env_name" '.environments[$env].failOnRisk // "Low"' "$targets")
 prefix=${4:-"blackbox-$env_name-$mode"}
 context="blackbox"
 
@@ -106,6 +113,30 @@ jobs:
       scanOnlyInScope: true
       enableTags: false
 EOF
+
+# The baseline, first of all the jobs that matter: an alert filter only applies to the alerts
+# raised after it is registered, so it has to come before any job generating traffic.
+# "note" is ours, not ZAP's: it is rendered as a YAML comment above the filter it documents.
+alert_filters() {
+    [ -f "$filters_file" ] || return 0
+    jq -r '
+        .filters[]? as $f
+        | [$f | del(.note) | to_entries[]] as $entries
+        | (if ($f.note // "") != "" then "      # " + $f.note else empty end),
+          ( range(0; $entries | length) as $i
+            | (if $i == 0 then "      - " else "        " end)
+              + $entries[$i].key + ": " + ($entries[$i].value | tojson) )
+    ' "$filters_file"
+}
+
+if [ -n "$(alert_filters)" ]; then
+    cat <<'EOF'
+
+  - type: alertFilter
+    alertFilters:
+EOF
+    alert_filters
+fi
 
 # Home-made passive scan rules, registered before any job that generates traffic.
 # The code is copied into the plan (inline) rather than mounted into the container: the plan
@@ -235,3 +266,16 @@ EOF
 # It weighs about 7 times more than the standard template.
 report_job traditional-html-plus
 report_job traditional-json
+
+# The gate. ZAP itself exits 0 whatever it finds, so this job is what turns an alert into a red
+# pipeline. Alerts requalified as "False Positive" by the alertFilter job are skipped by ZAP here
+# (ExitStatusJob ignores CONFIDENCE_FALSE_POSITIVE), which is what makes the baseline work.
+# alwaysRun so that the status is still set when an earlier job interrupts the plan.
+cat <<EOF
+
+  - type: exitStatus
+    parameters:
+      errorLevel: "$fail_on_risk"
+      warnLevel: "Informational"
+    alwaysRun: true
+EOF
