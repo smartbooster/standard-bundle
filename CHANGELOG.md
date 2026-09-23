@@ -1,5 +1,22 @@
 CHANGELOG for 1.x
 ===================
+## v1.8.0 - (2026-09-23)
+### TODO When updating
+The DAST scans (OWASP ZAP) moved to the stack-agnostic Standard Security Gitlab Package
+(see [ADR](adr/20260923-dast-extraction-to-standard-security.md)). `composer recipes:install smartbooster/standard-bundle --reset --force`
+does not remove the files copied by previous versions, so on a project that used them :
+- Install standard-security to keep the `dast-*` targets (see its README), then add `include .standard-security/security.mk` to the project's `Makefile`
+- Delete the files copied by the previous recipe : `git rm make/security.mk dast_scan/build-plan.sh && git rm -r dast_scan/scripts`
+- Keep `dast_scan/targets.json` and `dast_scan/alert-filters.json`, their format is unchanged
+- On a project that did not use the DAST scans, just delete `make/security.mk`, `dast_scan/build-plan.sh` and `dast_scan/scripts/`
+
+### Removed
+- `make/security.mk`, `dast_scan/build-plan.sh`, `dast_scan/scripts/` and `docs/security.md`, now shipped by Standard Security
+- recipe `smartbooster.standard-bundle.1.8.json` : no longer copies `make/security.mk`, `dast_scan/build-plan.sh` and `dast_scan/scripts/`
+
+### Added
+- `adr/20260923-dast-extraction-to-standard-security.md`
+
 ## v1.7.2 - (2026-09-23)
 ### Changed
 - `docs/front_code_validation.md` : label each `eslint.config.mjs`/`prettier.config.mjs` code block with its file name, add the missing
