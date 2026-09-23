@@ -186,6 +186,7 @@ Extra packages to add:
 Impact on the ESLint config, `.vue` added to the linted extensions and the preset spread after the JS rules:
 
 ```mjs
+// eslint.config.mjs
 import pluginVue from "eslint-plugin-vue"
 
   { name: "app/files-to-lint", files: ["**/*.{js,mjs,vue}"] },
@@ -222,7 +223,7 @@ Extra package to add:
 
 `yarn add --dev globals`
 
-The scope of the `lint` and `format` commands must be narrowed to the only directory holding front code, `assets`, which gives:
+The scope of the `lint` and `format` commands must be narrowed to the only directory holding front code, `assets`, which gives in `package.json`:
 
 ```json
 "scripts": {
@@ -230,7 +231,8 @@ The scope of the `lint` and `format` commands must be narrowed to the only direc
   "lint:check": "eslint assets",
   "lint:baseline": "rm -f eslint-suppressions.json && eslint assets --suppress-all",
   "format": "prettier --write assets",
-  "format:check": "prettier --check assets"
+  "format:check": "prettier --check assets",
+  "validation": "yarn lint:check; s=$?; yarn format:check && exit $s"
 }
 ```
 
@@ -242,6 +244,7 @@ Impact on the ESLint config: the front code runs in the browser, and Twig inject
 `no-undef` reports them.
 
 ```mjs
+// eslint.config.mjs
 import globals from "globals"
 
   {
@@ -260,6 +263,7 @@ The root config files (`vite.config.mjs`, `phpstorm.config.js`) stay out of that
 Widening the scope to them means adding their globals too, as they don't run in the browser:
 
 ```mjs
+// eslint.config.mjs
   {
     // Config files run under Node: `vite.config.mjs` reads `__dirname`.
     name: "app/globals-node",
@@ -275,6 +279,7 @@ entries), they receive their props from the Symfony controller. Two rules have n
 subject to both:
 
 ```mjs
+// eslint.config.mjs
   {
     name: "app/inertia-pages-and-layouts",
     files: ["**/scripts/pages/**/*.vue", "**/scripts/layout/**/*.vue"],
@@ -301,6 +306,7 @@ The official class sorter enforces one canonical order for the utility classes, 
 Impact on the Prettier config:
 
 ```mjs
+// prettier.config.mjs
   plugins: ["prettier-plugin-tailwindcss"],
   tailwindStylesheet: "./assets/styles/app.css",
 ```
@@ -313,6 +319,7 @@ Impact on the Prettier config:
 - One CSS entry per interface (admin, app, extranet, ...) → declare the main one as above and the others through `overrides`:
 
 ```mjs
+// prettier.config.mjs
   overrides: [
     { files: "assets/app/**", options: { tailwindStylesheet: "./assets/app/styles/main.css" } },
   ],
@@ -331,6 +338,7 @@ Extra package to add:
 `typescript-eslint` on the `.vue` files.
 
 ```mjs
+// eslint.config.mjs
 // import ...
 import { defineConfigWithVueTs, vueTsConfigs } from "@vue/eslint-config-typescript"
 
