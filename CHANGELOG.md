@@ -1,5 +1,10 @@
 CHANGELOG for 1.x
 ===================
+## v1.7.2 - (2026-09-23)
+### Changed
+- `docs/front_code_validation.md` : label each `eslint.config.mjs`/`prettier.config.mjs` code block with its file name, add the missing
+  `validation` script to the Symfony section's `package.json` example.
+
 ## v1.7.1 - (2026-09-23)
 ### TODO When updating
 - Run `composer recipes:install smartbooster/standard-bundle --reset --force` to pick up the updated `make/security.mk`,
