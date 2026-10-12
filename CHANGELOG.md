@@ -1,5 +1,14 @@
 CHANGELOG for 1.x
 ===================
+## v1.8.1 - (2026-10-12)
+### Added
+- `docs/rules.md` : the project rules checked by Smart App (PHP, PHPStan, JavaScript), each with what is checked and why, including the
+  reasons why `npm` is our main package manager, why Yarn is excluded and why pnpm is only accepted.
+
+### Changed
+- `docs/front_code_validation.md` : commands moved from `yarn` to `npm` (`npm install --save-dev`, `npm run`, `npx`), with a reminder
+  that `npm` is the package manager declared in `packageManager`, linking to [docs/rules.md](docs/rules.md#jspackage-manager).
+
 ## v1.8.0 - (2026-09-23)
 ### TODO When updating
 The DAST scans (OWASP ZAP) moved to the stack-agnostic Standard Security Gitlab Package

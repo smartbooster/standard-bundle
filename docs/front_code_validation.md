@@ -6,6 +6,9 @@ without Symfony (Vanilla Javascript, Typescript, Full Vue, Vue SPA, ...).
 > **Documentation only.** This bundle ships no front configuration: nothing below is copied by the recipe. This page states the
 > principle and the reference setup each project type applies.
 
+> **Package manager.** The commands below use `npm`, the package manager we use and declare in the `packageManager` field of
+> `package.json`. See [`js.package-manager`](rules.md#jspackage-manager) for why, and for what is accepted instead.
+
 ## Tool responsibilities
 
 | Tool      | Scope                                                                              |
@@ -82,7 +85,7 @@ This section is the framework agnostic base. Each following section adds what a 
 Command to run to add the dependencies to your `package.json`:
 
 ```sh
-yarn add --dev eslint @eslint/js eslint-config-prettier prettier
+npm install --save-dev eslint @eslint/js eslint-config-prettier prettier
 ```
 
 List of the commands to add in the `package.json` for each tool, plus the global validation one:
@@ -94,7 +97,7 @@ List of the commands to add in the `package.json` for each tool, plus the global
   "lint:baseline": "rm -f eslint-suppressions.json && eslint . --suppress-all",
   "format": "prettier --write .",
   "format:check": "prettier --check .",
-  "validation": "yarn lint:check; s=$?; yarn format:check && exit $s"
+  "validation": "npm run lint:check; s=$?; npm run format:check && exit $s"
 }
 ```
 
@@ -177,11 +180,11 @@ export default defineConfig([
 
 Extra packages to add:
 
-`yarn add --dev eslint-plugin-vue vue-eslint-parser`
+`npm install --save-dev eslint-plugin-vue vue-eslint-parser`
 
 > `vue-eslint-parser`, the parser that splits a `.vue` file to expose its template and its script to ESLint, is a peer dependency
-> of `eslint-plugin-vue`. It has to be declared if the project uses yarn instead of pnpm, as the former doesn't install peer deps
-> by default.
+> of `eslint-plugin-vue` that the config imports directly, so it is declared explicitly. npm and pnpm install peer deps by default,
+> Yarn doesn't, which is one of the reasons why it is [excluded](rules.md#jspackage-manager).
 
 Impact on the ESLint config, `.vue` added to the linted extensions and the preset spread after the JS rules:
 
@@ -221,7 +224,7 @@ that means rewriting every existing template for no functional gain, and which t
 
 Extra package to add:
 
-`yarn add --dev globals`
+`npm install --save-dev globals`
 
 The scope of the `lint` and `format` commands must be narrowed to the only directory holding front code, `assets`, which gives in `package.json`:
 
@@ -232,7 +235,7 @@ The scope of the `lint` and `format` commands must be narrowed to the only direc
   "lint:baseline": "rm -f eslint-suppressions.json && eslint assets --suppress-all",
   "format": "prettier --write assets",
   "format:check": "prettier --check assets",
-  "validation": "yarn lint:check; s=$?; yarn format:check && exit $s"
+  "validation": "npm run lint:check; s=$?; npm run format:check && exit $s"
 }
 ```
 
@@ -299,7 +302,7 @@ subject to both:
 
 Extra package to add:
 
-`yarn add --dev prettier-plugin-tailwindcss`
+`npm install --save-dev prettier-plugin-tailwindcss`
 
 The official class sorter enforces one canonical order for the utility classes, which removes any debate on where a class goes.
 
@@ -332,7 +335,7 @@ Impact on the Prettier config:
 
 Extra package to add:
 
-`yarn add --dev @vue/eslint-config-typescript`
+`npm install --save-dev @vue/eslint-config-typescript`
 
 [This config](https://github.com/vuejs/eslint-config-typescript), still the one of the create-vue TypeScript template, wires
 `typescript-eslint` on the `.vue` files.
@@ -363,7 +366,7 @@ code.
 
 - [Bulk suppressions](https://eslint.org/docs/latest/use/suppressions): `eslint-suppressions.json` counts existing violations per file
   and rule, only new ones fail. Same principle as the [PHPStan baseline](phpstan.md).
-- `yarn lint:baseline` regenerates it from scratch (`--suppress-all` never removes entries). Review its diff before committing.
+- `npm run lint:baseline` regenerates it from scratch (`--suppress-all` never removes entries). Review its diff before committing.
 - Violation fixed → entry obsolete → `lint:check` exits with code 2 → regenerate.
 - Only `error` rules are recorded.
 
@@ -374,10 +377,10 @@ There is no proper "baseline" in Prettier but there is a similar alternative cal
 The `requirePragma: true` config option restricts it to files starting with a `@format` pragma
 ([options](https://prettier.io/docs/options#require-pragma): "gradually transitioning large, unformatted codebases").
 
-- Opt a file in: `yarn prettier --write --no-require-pragma --insert-pragma <files>` (`--insert-pragma` alone does nothing,
+- Opt a file in: `npx prettier --write --no-require-pragma --insert-pragma <files>` (`--insert-pragma` alone does nothing,
   `requirePragma` wins).
 - Marker: `<!-- @format -->` in `.vue`, `/** @format */` in `.js` and `.css`.
-- Then `yarn lint:baseline`: formatting fixes `vue/first-attribute-linebreak`, its entries become obsolete.
+- Then `npm run lint:baseline`: formatting fixes `vue/first-attribute-linebreak`, its entries become obsolete.
 - Remove the option once every file is formatted.
 
 ### Prettier: one-shot formatting commit
@@ -387,7 +390,7 @@ with few front files, low sensitivity, and few people and open branches on it. T
 as every open branch will have to be rebased over the reformatted files.
 
 1. Commit the config, merge open branches.
-2. One commit with `yarn format`, nothing else.
+2. One commit with `npm run format`, nothing else.
 3. Safety net: `prettier --debug-check` on the same scope reports any file whose meaning might change.
 4. Once merged (squash or rebase changes the hash), add the commit hash to `.git-blame-ignore-revs`. Each dev runs
    `git config blame.ignoreRevsFile .git-blame-ignore-revs` (PhpStorm follows it). GitLab: *Blame preferences › Ignore specific revisions*.
