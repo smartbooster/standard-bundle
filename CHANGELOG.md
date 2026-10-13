@@ -1,5 +1,21 @@
 CHANGELOG for 1.x
 ===================
+## v1.8.2 - (2026-10-13)
+### TODO When updating
+- Run `composer recipes:install smartbooster/standard-bundle --reset --force` to pick up the updated `phpstan.neon` and `make/qualimetry.mk`
+  (the set of copied files is unchanged, so there is no new dotted manifest)
+- If the project overrides the PHPStan level, set it in `phpstan.neon` (`parameters.level`) : the `make` commands no longer pass `--level`
+  and a level given on the command line is not seen by the [`phpstan.level` rule](docs/rules.md#phpstanlevel)
+
+### Added
+- `docs/rules.md` : the [`infra.mysql-version` rule](docs/rules.md#inframysql-version) (`MYSQL_VERSION` in `.env`, patch included, the value
+  given to `doctrine.dbal.server_version`), and the `.env` as the source of the production versions
+
+### Changed
+- `phpstan.neon` : declares `level: 10` in `parameters`
+- `make/qualimetry.mk` : `phpstan` and `phpstan-generate-baseline` no longer pass `--level=10`, the level is read from `phpstan.neon`
+- `CLAUDE.md`, `docs/phpstan.md` : PHPStan command and level documentation aligned on the above
+
 ## v1.8.1 - (2026-10-12)
 ### Added
 - `docs/rules.md` : the project rules checked by Smart App (PHP, PHPStan, JavaScript), each with what is checked and why, including the

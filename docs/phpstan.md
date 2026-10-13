@@ -15,11 +15,12 @@ It is complemented — not replaced — by [Psalm taint analysis](psalm.md) for 
 
 ### For new project
 
-**Level.** Every new project runs at the **highest level** (`10` today), set in the copied `phpstan.neon`.
+**Level.** Every new project runs at the **highest level** (`10` today), set in the copied `phpstan.neon` (`parameters.level: 10`). The level is declared in the config file only,
+not on the command line of `make phpstan`, so that the [`phpstan.level` rule](rules.md#phpstanlevel) is compliant.
 
 ### Handle PHPStan for legacy project and handle level update
 
-When you first require the standard bundle it will copy the `phpstan.neon` default config and the `qualimetry.mk` whitch set the default level to 10.
+When you first require the standard bundle it will copy the `phpstan.neon` default config and the `qualimetry.mk` which set the default level to 10 (in `phpstan.neon`, not in the `make` commands).
 
 **Approach A: Move up level by level**
 

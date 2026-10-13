@@ -18,13 +18,56 @@ Rules are grouped by category, the subject of their code (`phpstan.level` → `p
 **Check :** `require.php` in `composer.json` accepts the whole minor of `PHP_VERSION`, and only that one (`~8.4.0`, `8.4.*`).
 A wider constraint (`>=8.1`, `^8.4`) is not compliant.
 
+```jsonc
+// composer.json, with PHP_VERSION=8.4
+{
+    "require": {
+        "php": "~8.4.0"
+    }
+}
+```
+
 **Why :** Composer must only resolve dependencies for the PHP version that runs in production.
 
 ### `php.composer-platform`
 
 **Check :** `config.platform.php` in `composer.json` is in the production minor (`8.4.0` for `PHP_VERSION=8.4`).
 
+```jsonc
+// composer.json, with PHP_VERSION=8.4
+{
+    "config": {
+        "platform": {
+            "php": "8.4.0"
+        }
+    }
+}
+```
+
 **Why :** Composer resolves dependencies for the production version, not for the one of the machine that runs the install.
+
+## Infrastructure
+
+### `infra.mysql-version`
+
+**Check :** `MYSQL_VERSION` in `.env` is a full version, patch included (`8.4.8`, not `8.4`). Not applicable when `composer.json`
+has no Doctrine (`doctrine/orm`, `doctrine/dbal` or `doctrine/doctrine-bundle`).
+
+```dotenv
+# .env
+MYSQL_VERSION=8.4.8
+```
+
+```yaml
+# config/packages/doctrine.yaml
+doctrine:
+    dbal:
+        server_version: "%env(resolve:MYSQL_VERSION)%"
+```
+
+**Why :** `MYSQL_VERSION` is the MySQL version of the production server, and the Docker box aligns on it. Doctrine needs it as
+`doctrine.dbal.server_version` to pick the right SQL platform without connecting to the database, and it expects the exact server
+version, patch included.
 
 ## PHPStan
 
@@ -32,6 +75,12 @@ A wider constraint (`>=8.1`, `^8.4`) is not compliant.
 
 **Check :** The PHPStan config file declares `level: 10`. A level only given on the command line (Makefile, CI) does not count,
 and `max` is not accepted.
+
+```neon
+# phpstan.neon
+parameters:
+    level: 10
+```
 
 **Why :** The highest level catches type errors before production. `max` moves with PHPStan versions: a level is tested before being
 imposed, so we declare `10` explicitly.
@@ -44,6 +93,13 @@ See [PHPStan](phpstan.md) for the setup of a new project and the level migration
 
 **Check :** One single lock file next to `package.json`: `package-lock.json` (npm) or `pnpm-lock.yaml` (pnpm), never `yarn.lock`.
 The `packageManager` field is mandatory and names the same manager as the lock (`npm@11.6.2`).
+
+```jsonc
+// package.json, next to a package-lock.json and no yarn.lock
+{
+    "packageManager": "npm@11.6.2"
+}
+```
 
 **Why :** One manager and its lock install the same dependency versions everywhere; two managers sharing a repository do not.
 `packageManager` makes the choice explicit and lets Corepack pin the version.
@@ -67,10 +123,24 @@ The `packageManager` field is mandatory and names the same manager as the lock (
 
 **Check :** `engines.node` in `package.json` accepts the major of `NODE_VERSION` and refuses the others (`24.x`, `^24.11`).
 
+```jsonc
+// package.json, with NODE_VERSION=24.11.1
+{
+    "engines": {
+        "node": "^24.11"
+    }
+}
+```
+
 **Why :** JavaScript dependencies must be installed for the Node version that runs in production.
 
 ### `js.engine-strict`
 
 **Check :** `engine-strict=true` in `.npmrc`.
+
+```ini
+# .npmrc
+engine-strict=true
+```
 
 **Why :** Without it `engines.node` is only a warning: npm installs anyway on a Node version the project refuses.
