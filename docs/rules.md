@@ -5,11 +5,17 @@ The rules every SMARTBOOSTER repository is checked against by Smart App.
 Each rule is evaluated on the files repository and ends up :
 - **compliant**,
 - **non compliant**, 
+- **info** (a figure to follow, nothing to fix : the debt of a baseline),
 - **not applicable** (the repository has no such file)
 - **unknown** (a file is unreadable, or the production version is not declared).
 
 Rules are grouped by category, the subject of their code (`phpstan.level` → `phpstan`). The PHP rules are not applicable without
 `composer.json`, the JavaScript rules without `package.json`.
+
+The rules that ask for a tool to be run by the CI (`psalm.taint`, `php.cs-fixer`, `symfony.lints`, `php.composer-check`) read the commands
+of `.gitlab-ci.yml`, with the `make` targets expanded from the `Makefile` and the files it includes. Nothing is executed : only the
+text of the files is read, so a tool run through `ifeq`, a GitLab `include:` of another repository, or a `composer` or `npm` script is
+not seen. What is checked is that the CI runs the tool, not that its last run is green.
 
 ## PHP
 
@@ -45,6 +51,46 @@ A wider constraint (`>=8.1`, `^8.4`) is not compliant.
 ```
 
 **Why :** Composer resolves dependencies for the production version, not for the one of the machine that runs the install.
+
+### `php.cs-fixer`
+
+**Check :** `.php-cs-fixer.php` (or `.php-cs-fixer.dist.php`) declares `'@Symfony' => true`, and the CI checks the style (`php-cs-fixer check`,
+or `php-cs-fixer fix --dry-run`) instead of fixing it silently.
+Without any rule set to `false` the rule is compliant, otherwise it is **info** with the number of disabled rules.
+
+```php
+// .php-cs-fixer.dist.php
+return (new PhpCsFixer\Config())
+    ->setRules([
+        '@Symfony' => true,
+        'yoda_style' => false, // disabled rule : counted, not a failure
+    ]);
+```
+
+```makefile
+# make/qualimetry.mk, called by the CI
+checkstyle:
+	vendor/bin/php-cs-fixer check -v
+```
+
+**Why :** One single code style avoids review debates and formatting diffs. Disabling a rule is how a legacy code migrates to the standard
+rule by rule : it is a debt to follow, not a failure. The config file is never executed, its tokens are read (comments excluded), so an
+option set to `false` inside the configuration of a rule is counted too.
+
+See [Qualimetry Assurance](qa.md#symfony-checkstyle).
+
+### `php.composer-check`
+
+**Check :** The CI runs `composer validate` and `composer audit`.
+
+```makefile
+# make/qualimetry.mk, called by the CI
+composer-validate:
+	composer validate composer.json
+	composer audit --abandoned=report
+```
+
+**Why :** An invalid `composer.json` or a dependency with a known vulnerability must stop the CI before production.
 
 ## Infrastructure
 
@@ -86,6 +132,120 @@ parameters:
 imposed, so we declare `10` explicitly.
 
 See [PHPStan](phpstan.md) for the setup of a new project and the level migration workflow of a legacy one.
+
+### `phpstan.baseline`
+
+**Check :** The PHPStan baseline (the file the config includes under a `baseline` name, `phpstan-baseline.neon` by default) is empty.
+A project without baseline is compliant. Otherwise the rule is **info**, with the total number of ignored errors : the sum of the `count`
+of each entry, not the number of entries.
+
+```neon
+# phpstan-baseline.neon : compliant
+parameters:
+    ignoreErrors: []
+```
+
+**Why :** Each error ignored by the baseline is a typing debt. The rule is not a failure, it measures the debt so that its reduction
+can be followed from one scan to the next.
+
+See [PHPStan](phpstan.md#handle-phpstan-for-legacy-project-and-handle-level-update).
+
+### `phpstan.extensions`
+
+**Check :** The `includes` of the PHPStan config contain the extensions of the standard : `phpstan-doctrine`, `phpstan-phpunit` and
+`phpstan-symfony` (their `extension.neon` **and** their `rules.neon`), and `phpstan-disallowed-calls` (its `extension.neon`).
+`phpstan-symfony` also needs `symfony.containerXmlPath`, without which it resolves no service.
+
+```neon
+# phpstan.neon
+includes:
+    - vendor/phpstan/phpstan-doctrine/extension.neon
+    - vendor/phpstan/phpstan-doctrine/rules.neon
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-phpunit/rules.neon
+    - vendor/phpstan/phpstan-symfony/extension.neon
+    - vendor/phpstan/phpstan-symfony/rules.neon
+    - vendor/spaze/phpstan-disallowed-calls/extension.neon
+
+parameters:
+    symfony:
+        containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
+```
+
+**Why :** The standard bundle installs the extensions as dependencies without enabling them : being in `composer.lock` proves nothing,
+the config is what activates them. Without them PHPStan understands neither Doctrine, PHPUnit nor the Symfony container.
+Only the `includes` of the config itself are read, not those of the files it includes.
+
+### `phpstan.disallowed-calls`
+
+**Check :** `parameters.disallowedFunctionCalls` of the PHPStan config bans the reference list of the standard : `exec`, `eval`, `system`,
+`passthru`, `shell_exec`, `phpinfo`, `popen`, `md5`, `sha1`, `assert`, `error_reporting`, `ini_set`. A project can ban more, not less.
+
+```neon
+# phpstan.neon
+parameters:
+    disallowedFunctionCalls:
+        -
+            function: 'exec()'
+            message: 'for security reasons. Use Symfony Process component instead.'
+        -
+            function: 'eval()'
+            message: 'for security reasons.'
+        # ... the 12 functions of the list
+```
+
+**Why :** These calls open security holes (command execution, broken hashes) or hide errors at runtime. Whether a function is dangerous does not depend
+on the data flow, so it is PHPStan that bans it, taint analysis being left to [Psalm](psalm.md). `function` is read with or without `()`,
+alone or as a list, whatever its case.
+
+See [PHPStan](phpstan.md#about-static-security-check-taint-analysis-and-responsability).
+
+## Psalm
+
+### `psalm.taint`
+
+**Check :** `psalm.xml` has `runTaintAnalysis="true"`, declares `psalm-taint-stubs.php` in its `<stubs>` (the file must be there), and the CI
+runs Psalm. With an empty taint baseline (`psalm-taint-baseline.xml`, or the one named by `errorBaseline`), or none, the rule is compliant.
+Otherwise it is **info**, with the number of ignored occurrences.
+
+```xml
+<!-- psalm.xml -->
+<psalm runTaintAnalysis="true" errorLevel="8" ...>
+    <stubs>
+        <file name="psalm-taint-stubs.php" />
+    </stubs>
+</psalm>
+```
+
+```makefile
+# make/qualimetry.mk, called by the CI
+psalm-ci:
+	vendor/bin/psalm --use-baseline=psalm-taint-baseline.xml
+```
+
+**Why :** Taint analysis follows the data of the user to the SQL, the HTML and the shell : an injection is seen before production.
+It needs both ends of every flow to be declared, hence the stubs for Doctrine. The baseline freezes the findings of a legacy code so that the CI
+only fails on new ones : it is a debt to follow, not a failure.
+
+See [Psalm](psalm.md).
+
+## Symfony
+
+### `symfony.lints`
+
+**Check :** The CI runs the four lints : PHP (`php -l`, or `parallel-lint`), `lint:twig`, `lint:yaml` and `lint:container`.
+
+```makefile
+# make/qualimetry.mk, called by the CI
+lint-twig:
+	$(CONSOLE) lint:twig templates
+lint-yaml:
+	$(CONSOLE) lint:yaml config translations
+lint-container:
+	$(CONSOLE) lint:container
+```
+
+**Why :** A syntax or configuration error is seen by the CI, not in production.
 
 ## JavaScript
 

@@ -10,6 +10,11 @@ CHANGELOG for 1.x
 ### Added
 - `docs/rules.md` : the [`infra.mysql-version` rule](docs/rules.md#inframysql-version) (`MYSQL_VERSION` in `.env`, patch included, the value
   given to `doctrine.dbal.server_version`), and the `.env` as the source of the production versions
+- `docs/rules.md` : the PHP code quality rules checked by Smart App : [`phpstan.baseline`](docs/rules.md#phpstanbaseline),
+  [`phpstan.extensions`](docs/rules.md#phpstanextensions), [`phpstan.disallowed-calls`](docs/rules.md#phpstandisallowed-calls),
+  [`psalm.taint`](docs/rules.md#psalmtaint), [`php.cs-fixer`](docs/rules.md#phpcs-fixer), [`symfony.lints`](docs/rules.md#symfonylints)
+  and [`php.composer-check`](docs/rules.md#phpcomposer-check), and the new **info** status (a figure to follow, nothing to fix : the debt of
+  a baseline or of the disabled `php-cs-fixer` rules). The rules about the CI read `.gitlab-ci.yml` and the `make` targets it calls, without running anything
 
 ### Changed
 - `phpstan.neon` : declares `level: 10` in `parameters`
