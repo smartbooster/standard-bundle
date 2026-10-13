@@ -20,7 +20,7 @@ through it: `docker compose exec php <command>` from the consumer project root (
 Do not run `php`/`vendor/bin/*` directly against the host PHP install; it will not match the container's PHP version/extensions and can produce
 misleading results (e.g. missing `var/cache/dev/App_KernelDevDebugContainer.xml` errors from `phpstan-symfony` when there's no app to boot).
 
-- Static analysis (types, level 10 + disallowed calls): `vendor/bin/phpstan analyse src tests --level=10 --memory-limit=1G -v -c phpstan.neon`
+- Static analysis (types, level 10 + disallowed calls): `vendor/bin/phpstan analyse src tests --memory-limit=1G -v -c phpstan.neon` (the level 10 comes from `phpstan.neon`)
   - Regenerate baseline: same command with `--allow-empty-baseline --generate-baseline` (writes `phpstan-baseline.neon`)
   - Requires two things this repo doesn't have out of the box (see `.github/workflows/qualimetry.yml` for the exact steps): a stub
     `var/cache/dev/App_KernelDevDebugContainer.xml` (`phpstan.neon`'s `symfony.containerXmlPath` expects a booted kernel's container dump — an
