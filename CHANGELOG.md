@@ -7,6 +7,10 @@ CHANGELOG for 1.x
 - If the project overrides the PHPStan level, set it in `phpstan.neon` (`parameters.level`) : the `make` commands no longer pass `--level`
   and a level given on the command line is not seen by the [`phpstan.level` rule](docs/rules.md#phpstanlevel)
 
+### Added
+- `docs/rules.md` : the [`infra.mysql-version` rule](docs/rules.md#inframysql-version) (`MYSQL_VERSION` in `.env`, patch included, the value
+  given to `doctrine.dbal.server_version`), and the `.env` as the source of the production versions
+
 ### Changed
 - `phpstan.neon` : declares `level: 10` in `parameters`
 - `make/qualimetry.mk` : `phpstan` and `phpstan-generate-baseline` no longer pass `--level=10`, the level is read from `phpstan.neon`
