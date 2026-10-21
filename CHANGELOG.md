@@ -1,5 +1,18 @@
 CHANGELOG for 1.x
 ===================
+## v1.8.3 - (2026-10-21)
+### Added
+- `docs/rules.md` : the front rules checked by Smart App, in a new ESLint category : [`eslint.config`](docs/rules.md#eslintconfig) (flat
+  config, `eslint-config-prettier` when the project has Prettier, run by the CI), [`eslint.vue-preset`](docs/rules.md#eslintvue-preset)
+  (`flat/strongly-recommended` or above), [`eslint.js-recommended`](docs/rules.md#eslintjs-recommended) and
+  [`eslint.suppressions`](docs/rules.md#eslintsuppressions) (**info** with the number of suppressed errors), and in the JavaScript one :
+  [`js.prettier`](docs/rules.md#jsprettier) (with Tailwind only), [`js.type-check`](docs/rules.md#jstype-check) (projects with TypeScript
+  only) and [`js.vite`](docs/rules.md#jsvite) (**info** with a Webpack build)
+
+### Changed
+- `docs/rules.md` : the rules about the CI now also follow the `package.json` scripts run by the CI (`npm run`, `pnpm`, `yarn`), and the
+  front tool configs are read by patterns, never executed
+
 ## v1.8.2 - (2026-10-13)
 ### TODO When updating
 - Run `composer recipes:install smartbooster/standard-bundle --reset --force` to pick up the updated `phpstan.neon` and `make/qualimetry.mk`

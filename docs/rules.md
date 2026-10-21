@@ -5,17 +5,22 @@ The rules every SMARTBOOSTER repository is checked against by Smart App.
 Each rule is evaluated on the files repository and ends up :
 - **compliant**,
 - **non compliant**, 
-- **info** (a figure to follow, nothing to fix : the debt of a baseline),
+- **info** (a figure to follow, nothing to fix : the debt of a baseline, a build tool to migrate),
 - **not applicable** (the repository has no such file)
 - **unknown** (a file is unreadable, or the production version is not declared).
 
 Rules are grouped by category, the subject of their code (`phpstan.level` → `phpstan`). The PHP rules are not applicable without
 `composer.json`, the JavaScript rules without `package.json`.
 
-The rules that ask for a tool to be run by the CI (`psalm.taint`, `php.cs-fixer`, `symfony.lints`, `php.composer-check`) read the commands
-of `.gitlab-ci.yml`, with the `make` targets expanded from the `Makefile` and the files it includes. Nothing is executed : only the
-text of the files is read, so a tool run through `ifeq`, a GitLab `include:` of another repository, or a `composer` or `npm` script is
-not seen. What is checked is that the CI runs the tool, not that its last run is green.
+The rules that ask for a tool to be run by the CI (`psalm.taint`, `php.cs-fixer`, `symfony.lints`, `php.composer-check`, `eslint.config`,
+`js.prettier`, `js.type-check`) read the commands of `.gitlab-ci.yml`, with the `make` targets expanded from the `Makefile` and the files it
+includes, and the `package.json` scripts expanded for `npm run <script>` (`npm run-script`, `npm test`, `pnpm` and `yarn` with or without
+`run`). Nothing is executed : only the text of the files is read, so a tool run through `ifeq`, a GitLab `include:` of another repository,
+a `composer` script or an npm `pre`/`post` script is not seen. What is checked is that the CI runs the tool, not that its last run is green.
+
+The front tool configs (`eslint.config.*`, the Prettier config) are JavaScript modules most of the time : they are never executed either,
+they are read by patterns with their comments excluded. A config built by code (a package name in a variable, a preset picked by a
+condition) is not followed.
 
 ## PHP
 
@@ -304,3 +309,160 @@ engine-strict=true
 ```
 
 **Why :** Without it `engines.node` is only a warning: npm installs anyway on a Node version the project refuses.
+
+### `js.prettier`
+
+**Check :** Only on a repository with Tailwind (`tailwindcss` in the `dependencies` or `devDependencies` of `package.json`), not applicable
+otherwise. `prettier` is in the `devDependencies`, the Prettier config loads the Tailwind class sorter (`prettier-plugin-tailwindcss`), and
+the CI checks the formatting (`prettier --check`, `-c`, or `--list-different`), directly or through a `package.json` script.
+
+The config is the one Prettier reads : the `prettier` key of `package.json` first, then `.prettierrc`, `.prettierrc.{json,yml,yaml,json5}`,
+`.prettierrc.*` or `prettier.config.*` (`js`, `ts`, `mjs`, `mts`, `cjs`, `cts`), then `.prettierrc.toml`. A `prettier` key naming a shared
+config (`"@acme/prettier-config"`) is **unknown** : its plugins are not read.
+
+```mjs
+// prettier.config.mjs
+export default {
+  plugins: ["prettier-plugin-tailwindcss"],
+  tailwindStylesheet: "./assets/styles/app.css",
+}
+```
+
+```json
+"scripts": {
+  "format:check": "prettier --check assets",
+  "validation": "npm run lint:check; s=$?; npm run format:check && exit $s"
+}
+```
+
+**Why :** One single formatting, Tailwind classes order included, avoids review debates and formatting diffs. In our standard it is
+the class sorter that gives Prettier its meaning, hence a rule that only applies with Tailwind.
+
+See [Front code validation](front_code_validation.md#tailwind-css).
+
+### `js.type-check`
+
+**Check :** Does not force TypeScript : the rule only applies to a project that contains some, i.e. when GitLab counts TypeScript among the
+languages of the repository, or when a `tsconfig.json` is at its root (GitLab counts a `.vue` as « Vue » even when its script is in
+TypeScript). Its types are then checked : the checker is installed in the `devDependencies`, run by a `package.json` script, and the CI runs it,
+directly or through that script. The value is the name of the script.
+
+The checker is `vue-tsc` in a Vue project (the only one that reads the `.vue` files) or when it is installed, `tsc` (package `typescript`)
+otherwise.
+
+```json
+"scripts": {
+  "type-check": "vue-tsc --noEmit",
+  "validation": "npm run lint:check; s=$?; npm run format:check && npm run type-check && exit $s"
+}
+```
+
+**Why :** ESLint, with the TypeScript parser, reads the code but does not check the types, and neither does the Vite build : without a
+type checker, a type error goes to production.
+
+See [Front code validation](front_code_validation.md#typescript).
+
+### `js.vite`
+
+**Check :** The front code is built by Vite alone : a `vite.config.*` at the root and `vite` in the `devDependencies`, without Webpack
+(`webpack.config.*`, `webpack` or `@symfony/webpack-encore` in `package.json`). Otherwise the rule is **info**, with the build tool as value
+(`webpack-encore`, `webpack`, or both during a migration), and without value when Vite is only half set up (a `vite.config.*` without
+`vite`, or the reverse). Not applicable without any front build.
+
+```jsonc
+// package.json, next to a vite.config.mjs
+{
+    "devDependencies": {
+        "vite": "^8.1.3"
+    }
+}
+```
+
+**Why :** One build tool, fast and maintained, for every project. A Webpack build is not a failure but a migration to plan.
+
+## ESLint
+
+### `eslint.config`
+
+**Check :** `eslint` is in the `devDependencies`, configured with the flat format (`eslint.config.*` : `js`, `mjs`, `cjs`, `ts`, `mts`, `cts`,
+the only one ESLint 9 reads; a legacy `.eslintrc*` is not compliant), and the CI runs it, directly or through a `package.json` script.
+When the project has Prettier (`prettier` in the `devDependencies`), the config also imports `eslint-config-prettier` (or the former
+`@vue/eslint-config-prettier`).
+
+```mjs
+// eslint.config.mjs
+import js from "@eslint/js"
+import { defineConfig } from "eslint/config"
+import skipFormatting from "eslint-config-prettier/flat"
+
+export default defineConfig([
+  { name: "app/files-to-lint", files: ["**/*.{js,mjs}"] },
+  js.configs.recommended,
+  skipFormatting,
+])
+```
+
+```yaml
+# .gitlab-ci.yml
+test:
+  script:
+    - npm run validation  # npm run lint:check → eslint assets
+```
+
+**Why :** The errors of the front code are seen by the CI, not in production. With Prettier, `eslint-config-prettier` turns off the ESLint
+rules that duplicate or fight its formatting; without Prettier it has nothing to turn off, so it is not asked.
+
+See [Front code validation](front_code_validation.md#eslint--prettier-boundary).
+
+### `eslint.vue-preset`
+
+**Check :** The ESLint config applies an `eslint-plugin-vue` preset at least as demanding as `flat/strongly-recommended`, the SmartBooster
+target (`flat/essential` < `flat/strongly-recommended` < `flat/recommended`). The `-error` variant of a preset counts as its preset. The
+value is the most demanding preset of the config, as written. Not applicable without Vue : neither `vue` in `package.json`, nor Vue among the
+languages GitLab counts (a VuePress project receives Vue through `vuepress` and still writes its components).
+
+```mjs
+// eslint.config.mjs
+import pluginVue from "eslint-plugin-vue"
+
+  ...pluginVue.configs["flat/strongly-recommended-error"],
+```
+
+**Why :** Vue components are written the same way from one dev to another : `flat/essential` only catches errors, `strongly-recommended`
+adds the consistency rules (prop casing, event hyphenation, default props).
+
+See [Front code validation](front_code_validation.md#vue) for why this level and not `recommended`.
+
+### `eslint.js-recommended`
+
+**Check :** The ESLint config applies the recommended rules of ESLint : `js.configs.recommended`, `js` being the name given to the import of
+`@eslint/js` (another package's `configs.recommended`, like `tseslint.configs.recommended`, does not count), or `eslint:recommended`.
+
+```mjs
+// eslint.config.mjs
+import js from "@eslint/js"
+
+  js.configs.recommended,
+```
+
+**Why :** Without them ESLint only reports what the plugins add, and lets an undeclared variable or unreachable code through.
+
+### `eslint.suppressions`
+
+**Check :** The ESLint bulk suppressions (`eslint-suppressions.json`, written by `eslint --suppress-all`) are empty. A project without the
+file is compliant. Otherwise the rule is **info**, with the total number of suppressed errors : the sum of the `count` of each rule of each
+file.
+
+```jsonc
+// eslint-suppressions.json : info, 3 suppressed errors
+{
+    "assets/scripts/main.js": {
+        "no-undef": { "count": 3 }
+    }
+}
+```
+
+**Why :** Each suppressed error is a debt of the front code, like the [PHPStan baseline](#phpstanbaseline). The rule is not a failure,
+it measures the debt so that its reduction can be followed from one scan to the next.
+
+See [Front code validation](front_code_validation.md#eslint-baseline).
