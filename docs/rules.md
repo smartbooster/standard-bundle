@@ -282,7 +282,7 @@ Cobertura report (`artifacts:reports:coverage_report`).
 ```yaml
 # .gitlab-ci.yml
 test:
-  coverage: /^\s*Lines:\s*\d+.\d+\%/
+  coverage: /^\s*(?:\x1b\[[0-9;]*m)?\s*Lines:\s*(\d+(?:\.\d+)?)%/
   artifacts:
     reports:
       coverage_report:
