@@ -8,6 +8,11 @@ CHANGELOG for 1.x
   [`eslint.suppressions`](docs/rules.md#eslintsuppressions) (**info** with the number of suppressed errors), and in the JavaScript one :
   [`js.prettier`](docs/rules.md#jsprettier) (with Tailwind only), [`js.type-check`](docs/rules.md#jstype-check) (projects with TypeScript
   only) and [`js.vite`](docs/rules.md#jsvite) (**info** with a Webpack build)
+- `docs/rules.md` : the test rules checked by Smart App, in a new PHPUnit category : [`phpunit.ci`](docs/rules.md#phpunitci) (PHPUnit
+  config, `*Test.php` under `tests/`, run by the CI with its JUnit report published), [`phpunit.coverage`](docs/rules.md#phpunitcoverage)
+  (`coverage` regex on the job running PHPUnit and Cobertura `coverage_report` in `.gitlab-ci.yml`, with the rate of that job on the
+  pipeline of the analysed commit as value) and [`phpunit.smoke-test`](docs/rules.md#phpunitsmoke-test) (a
+  `*AvailabilityTest.php` under `tests/`)
 
 ### Changed
 - `docs/rules.md` : the rules about the CI now also follow the `package.json` scripts run by the CI (`npm run`, `pnpm`, `yarn`), and the

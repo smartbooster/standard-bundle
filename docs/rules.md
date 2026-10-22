@@ -12,11 +12,13 @@ Each rule is evaluated on the files repository and ends up :
 Rules are grouped by category, the subject of their code (`phpstan.level` → `phpstan`). The PHP rules are not applicable without
 `composer.json`, the JavaScript rules without `package.json`.
 
-The rules that ask for a tool to be run by the CI (`psalm.taint`, `php.cs-fixer`, `symfony.lints`, `php.composer-check`, `eslint.config`,
-`js.prettier`, `js.type-check`) read the commands of `.gitlab-ci.yml`, with the `make` targets expanded from the `Makefile` and the files it
-includes, and the `package.json` scripts expanded for `npm run <script>` (`npm run-script`, `npm test`, `pnpm` and `yarn` with or without
-`run`). Nothing is executed : only the text of the files is read, so a tool run through `ifeq`, a GitLab `include:` of another repository,
-a `composer` script or an npm `pre`/`post` script is not seen. What is checked is that the CI runs the tool, not that its last run is green.
+The rules that ask for a tool to be run by the CI (`psalm.taint`, `php.cs-fixer`, `symfony.lints`, `php.composer-check`, `phpunit.ci`,
+`eslint.config`, `js.prettier`, `js.type-check`) read the commands of `.gitlab-ci.yml`, with the `make` targets expanded from the
+`Makefile` and the files it includes, and the `package.json` scripts expanded for `npm run <script>` (`npm run-script`, `npm test`, `pnpm`
+and `yarn` with or without `run`). Nothing is executed : only the text of the files is read, so a tool run through `ifeq`, a GitLab
+`include:` of another repository, a `composer` script or an npm `pre`/`post` script is not seen. What is checked is that the CI runs the
+tool, not that its last run is green. The reports that the CI publishes to GitLab (`phpunit.ci`, `phpunit.coverage`) are read on the same
+jobs : a manual job does not count, except the `test` one.
 
 The front tool configs (`eslint.config.*`, the Prettier config) are JavaScript modules most of the time : they are never executed either,
 they are read by patterns with their comments excluded. A config built by code (a package name in a variable, a preset picked by a
@@ -251,6 +253,61 @@ lint-container:
 ```
 
 **Why :** A syntax or configuration error is seen by the CI, not in production.
+
+## PHPUnit
+
+### `phpunit.ci`
+
+**Check :** A PHPUnit config is at the root (`phpunit.xml`, `phpunit.dist.xml` or `phpunit.xml.dist`), `tests/` holds test classes
+(`*Test.php`), the CI runs PHPUnit (`simple-phpunit`, `phpunit`, `paratest`) and publishes the JUnit report of the tests.
+
+```yaml
+# .gitlab-ci.yml
+test:
+  artifacts:
+    reports:
+      junit: build/phpunit-report.xml
+  script:
+    - make coverage # vendor/bin/simple-phpunit ... --log-junit build/phpunit-report.xml
+```
+
+**Why :** Tests that do not run on every push protect nothing. With the JUnit report, GitLab shows the failed tests in the merge request.
+Only the files are read : whether the last pipeline is green is not checked.
+
+### `phpunit.coverage`
+
+**Check :** The CI publishes the code coverage to GitLab : the rate read in the log of the job running PHPUnit (`coverage`, a regular
+expression) and the Cobertura report (`artifacts:reports:coverage_report`). The job running PHPUnit is found by its commands, with the
+`make` targets and `npm run` scripts expanded (`make coverage` → `vendor/bin/simple-phpunit …`).
+
+```yaml
+# .gitlab-ci.yml
+test:
+  coverage: /^\s*(?:\x1b\[[0-9;]*m)?\s*Lines:\s*(\d+(?:\.\d+)?)%/
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: build/phpunit-cobertura.xml
+```
+
+**Why :** The rate followed from one pipeline to the next, and the covered lines shown in the merge request diff, show what the tests leave
+out. The Cobertura report of any job counts : the rule does not check that it is the job running PHPUnit.
+
+**Value :** The rate of the job running PHPUnit on the pipeline of the analysed commit, read through the GitLab API. It is not the rate
+of the pipeline : GitLab averages it over every job that reads a rate, so PHPUnit at 50 % and Vitest at 90 % give 70 %, which measures
+nothing. No value when the job was not run (a manual `test` job), when the commit has no pipeline, when several jobs run PHPUnit and read
+a rate, or when the job is split with `parallel` (one rate per part). The value never changes the status. Smart App also keeps the last
+rate read on the repository, with its commit and date : a scan without a rate does not erase it.
+
+### `phpunit.smoke-test`
+
+**Check :** `tests/` holds a URL smoke test, found by its name : a `*AvailabilityTest.php` file (`tests/Admin/AdminAvailabilityTest.php`).
+
+**Why :** A single test calling every page catches most wiring regressions for very little code : misconfigured service, broken template,
+missing route. The file is not read : the rule does not check that every URL is in it.
+
+See [Smoke test your URLs](phpunit.md#smoke-test-your-urls).
 
 ## JavaScript
 
