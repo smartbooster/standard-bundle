@@ -276,8 +276,9 @@ Only the files are read : whether the last pipeline is green is not checked.
 
 ### `phpunit.coverage`
 
-**Check :** The CI publishes the code coverage to GitLab : the rate read in the job log (`coverage`, a regular expression) and the
-Cobertura report (`artifacts:reports:coverage_report`).
+**Check :** The CI publishes the code coverage to GitLab : the rate read in the log of the job running PHPUnit (`coverage`, a regular
+expression) and the Cobertura report (`artifacts:reports:coverage_report`). The job running PHPUnit is found by its commands, with the
+`make` targets and `npm run` scripts expanded (`make coverage` → `vendor/bin/simple-phpunit …`).
 
 ```yaml
 # .gitlab-ci.yml
@@ -291,7 +292,13 @@ test:
 ```
 
 **Why :** The rate followed from one pipeline to the next, and the covered lines shown in the merge request diff, show what the tests leave
-out. The reports of any job count : the rule does not check that it is the job running PHPUnit.
+out. The Cobertura report of any job counts : the rule does not check that it is the job running PHPUnit.
+
+**Value :** The rate of the job running PHPUnit on the pipeline of the analysed commit, read through the GitLab API. It is not the rate
+of the pipeline : GitLab averages it over every job that reads a rate, so PHPUnit at 50 % and Vitest at 90 % give 70 %, which measures
+nothing. No value when the job was not run (a manual `test` job), when the commit has no pipeline, when several jobs run PHPUnit and read
+a rate, or when the job is split with `parallel` (one rate per part). The value never changes the status. Smart App also keeps the last
+rate read on the repository, with its commit and date : a scan without a rate does not erase it.
 
 ### `phpunit.smoke-test`
 

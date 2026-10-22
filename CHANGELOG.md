@@ -10,7 +10,8 @@ CHANGELOG for 1.x
   only) and [`js.vite`](docs/rules.md#jsvite) (**info** with a Webpack build)
 - `docs/rules.md` : the test rules checked by Smart App, in a new PHPUnit category : [`phpunit.ci`](docs/rules.md#phpunitci) (PHPUnit
   config, `*Test.php` under `tests/`, run by the CI with its JUnit report published), [`phpunit.coverage`](docs/rules.md#phpunitcoverage)
-  (`coverage` regex and Cobertura `coverage_report` in `.gitlab-ci.yml`) and [`phpunit.smoke-test`](docs/rules.md#phpunitsmoke-test) (a
+  (`coverage` regex on the job running PHPUnit and Cobertura `coverage_report` in `.gitlab-ci.yml`, with the rate of that job on the
+  pipeline of the analysed commit as value) and [`phpunit.smoke-test`](docs/rules.md#phpunitsmoke-test) (a
   `*AvailabilityTest.php` under `tests/`)
 
 ### Changed
