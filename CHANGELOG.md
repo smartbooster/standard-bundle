@@ -1,5 +1,17 @@
 CHANGELOG for 1.x
 ===================
+## v1.9.0 - (2026-11-03)
+### TODO When updating
+- Run `composer update smartbooster/standard-bundle && composer recipes:install smartbooster/standard-bundle --reset --force` to pick up
+  the new recipe `smartbooster.standard-bundle.1.9.json` (same copied files as `1.8`, the new `ref` only lets Flex see the version)
+- A project moving to Symfony 8.0 needs PHP `>=8.4` (a requirement of Symfony itself, the bundle still accepts PHP `^8.1` with Symfony 5.4 to 7.4)
+
+### Added
+- Symfony 8.0 support : `symfony/framework-bundle`, `symfony/validator`, `symfony/dotenv` and `symfony/phpunit-bridge` now accept `^8.0` next to `^5.4|^6.2|^7.4`.
+  The install was checked on a bare `composer update` forcing `framework-bundle` and `validator` to `^8.0`
+  (everything resolved to 8.1.x with PHP 8.4, `phpunit-bridge` included, along with `phpstan-symfony`, `psalm/plugin-symfony`, `liip/test-fixtures-bundle` and `php-cs-fixer`)
+- recipe `smartbooster.standard-bundle.1.9.json`, registered in `recipes.json`
+
 ## v1.8.3 - (2026-10-21)
 ### Added
 - `docs/rules.md` : the front rules checked by Smart App, in a new ESLint category : [`eslint.config`](docs/rules.md#eslintconfig) (flat
