@@ -52,7 +52,8 @@
   },
   "extra": {
     "branch-alias": {
-      "dev-master": "1.0.x-dev"
+      "dev-master": "1.0.x-dev",
+      "dev-symfony_8_0": "1.9.x-dev"
     }
   }
 }
